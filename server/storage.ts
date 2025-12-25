@@ -1,38 +1,43 @@
-import { type User, type InsertUser } from "@shared/schema";
-import { randomUUID } from "crypto";
-
-// modify the interface with any CRUD methods
-// you might need
+import { db } from "./db";
+import {
+  configurations,
+  type Configuration,
+  type InsertConfiguration,
+  type UpdateConfiguration,
+} from "@shared/schema";
+import { eq } from "drizzle-orm";
 
 export interface IStorage {
-  getUser(id: string): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
+  getConfiguration(): Promise<Configuration>;
+  updateConfiguration(config: InsertConfiguration): Promise<Configuration>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<string, User>;
-
-  constructor() {
-    this.users = new Map();
+export class DatabaseStorage implements IStorage {
+  async getConfiguration(): Promise<Configuration> {
+    const [config] = await db.select().from(configurations).limit(1);
+    if (config) return config;
+    
+    // Create default if not exists
+    const [newConfig] = await db.insert(configurations).values({
+      symbol: "btcusdt",
+      buyThreshold: 10,
+      sellThreshold: 10,
+      buyKey: "x",
+      sellKey: "y",
+      isActive: true
+    }).returning();
+    return newConfig;
   }
 
-  async getUser(id: string): Promise<User | undefined> {
-    return this.users.get(id);
-  }
-
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
-  }
-
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const id = randomUUID();
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
-    return user;
+  async updateConfiguration(update: InsertConfiguration): Promise<Configuration> {
+    const current = await this.getConfiguration();
+    const [updated] = await db
+      .update(configurations)
+      .set(update)
+      .where(eq(configurations.id, current.id))
+      .returning();
+    return updated;
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
