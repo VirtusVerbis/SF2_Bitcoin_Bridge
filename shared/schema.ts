@@ -12,7 +12,10 @@ export const configurations = pgTable("configurations", {
   isActive: boolean("is_active").notNull().default(true),
 });
 
-export const insertConfigurationSchema = createInsertSchema(configurations).omit({ id: true });
+export const insertConfigurationSchema = createInsertSchema(configurations).omit({ id: true }).extend({
+  buyThreshold: z.union([z.string(), z.number()]).pipe(z.coerce.string()),
+  sellThreshold: z.union([z.string(), z.number()]).pipe(z.coerce.string()),
+});
 
 export type Configuration = typeof configurations.$inferSelect;
 export type InsertConfiguration = z.infer<typeof insertConfigurationSchema>;
