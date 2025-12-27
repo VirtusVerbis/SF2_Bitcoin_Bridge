@@ -35,6 +35,8 @@ interface ConfigPanelProps {
 const formSchema = insertConfigurationSchema.extend({
   buyThreshold: z.coerce.number().gt(0),
   sellThreshold: z.coerce.number().gt(0),
+  coinbaseBuyThreshold: z.coerce.number().gt(0),
+  coinbaseSellThreshold: z.coerce.number().gt(0),
 });
 
 export function ConfigPanel({ config }: ConfigPanelProps) {
@@ -50,6 +52,11 @@ export function ConfigPanel({ config }: ConfigPanelProps) {
       sellThreshold: config.sellThreshold,
       buyKey: config.buyKey,
       sellKey: config.sellKey,
+      coinbaseSymbol: config.coinbaseSymbol,
+      coinbaseBuyThreshold: config.coinbaseBuyThreshold,
+      coinbaseSellThreshold: config.coinbaseSellThreshold,
+      coinbaseBuyKey: config.coinbaseBuyKey,
+      coinbaseSellKey: config.coinbaseSellKey,
       isActive: config.isActive,
     },
   });
@@ -62,6 +69,11 @@ export function ConfigPanel({ config }: ConfigPanelProps) {
       sellThreshold: config.sellThreshold,
       buyKey: config.buyKey,
       sellKey: config.sellKey,
+      coinbaseSymbol: config.coinbaseSymbol,
+      coinbaseBuyThreshold: config.coinbaseBuyThreshold,
+      coinbaseSellThreshold: config.coinbaseSellThreshold,
+      coinbaseBuyKey: config.coinbaseBuyKey,
+      coinbaseSellKey: config.coinbaseSellKey,
       isActive: config.isActive,
     });
   }, [config, form]);
@@ -164,6 +176,83 @@ export function ConfigPanel({ config }: ConfigPanelProps) {
                 <FormField
                   control={form.control}
                   name="sellKey"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Sell Key</FormLabel>
+                      <FormControl>
+                        <Input {...field} maxLength={1} className="font-mono text-center uppercase" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="col-span-2 border-t border-white/10 pt-4">
+                <h4 className="text-sm font-semibold mb-4">Coinbase Configuration</h4>
+              </div>
+
+              <FormField
+                control={form.control}
+                name="coinbaseSymbol"
+                render={({ field }) => (
+                  <FormItem className="col-span-2">
+                    <FormLabel>Trading Pair (Coinbase)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="BTC-USD" {...field} className="font-mono uppercase" />
+                    </FormControl>
+                    <FormDescription>The product ID to monitor (e.g., BTC-USD, ETH-USD).</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="col-span-2 grid grid-cols-2 gap-4 p-4 rounded-xl bg-secondary/30 border border-white/5">
+                <FormField
+                  control={form.control}
+                  name="coinbaseBuyThreshold"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-[hsl(var(--color-buy))]">Buy Threshold</FormLabel>
+                      <FormControl>
+                        <Input type="number" step="0.00000001" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="coinbaseBuyKey"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Buy Key</FormLabel>
+                      <FormControl>
+                        <Input {...field} maxLength={1} className="font-mono text-center uppercase" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="col-span-2 grid grid-cols-2 gap-4 p-4 rounded-xl bg-secondary/30 border border-white/5">
+                <FormField
+                  control={form.control}
+                  name="coinbaseSellThreshold"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-[hsl(var(--color-sell))]">Sell Threshold</FormLabel>
+                      <FormControl>
+                        <Input type="number" step="0.00000001" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="coinbaseSellKey"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Sell Key</FormLabel>

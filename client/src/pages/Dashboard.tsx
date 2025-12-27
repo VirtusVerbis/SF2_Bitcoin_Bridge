@@ -1,5 +1,6 @@
 import { useConfiguration } from "@/hooks/use-configuration";
 import { useBinanceSocket } from "@/hooks/use-binance-socket";
+import { useCoinbaseSocket } from "@/hooks/use-coinbase-socket";
 import { ConfigPanel } from "@/components/ConfigPanel";
 import { KeyIndicator } from "@/components/KeyIndicator";
 import { VolumeChart } from "@/components/VolumeChart";
@@ -10,16 +11,27 @@ import { cn } from "@/lib/utils";
 export default function Dashboard() {
   const { data: config, isLoading: configLoading, error: configError } = useConfiguration();
   
-  const { data: streamData, status: streamStatus } = useBinanceSocket(
+  const { data: binanceData, status: binanceStatus } = useBinanceSocket(
     config?.symbol || "", 
     config?.isActive
   );
 
-  // Derive active states locally based on thresholds
+  const { data: coinbaseData, status: coinbaseStatus } = useCoinbaseSocket(
+    config?.coinbaseSymbol || "", 
+    config?.isActive
+  );
+
+  // Binance thresholds and active states
   const buyThresholdNum = config?.buyThreshold ? Number(config.buyThreshold) : Infinity;
   const sellThresholdNum = config?.sellThreshold ? Number(config.sellThreshold) : Infinity;
-  const isBuyActive = config?.isActive && streamData.buyQuantity >= buyThresholdNum;
-  const isSellActive = config?.isActive && streamData.sellQuantity >= sellThresholdNum;
+  const isBinanceBuyActive = config?.isActive && binanceData.buyQuantity >= buyThresholdNum;
+  const isBinanceSellActive = config?.isActive && binanceData.sellQuantity >= sellThresholdNum;
+
+  // Coinbase thresholds and active states
+  const coinbaseBuyThresholdNum = config?.coinbaseBuyThreshold ? Number(config.coinbaseBuyThreshold) : Infinity;
+  const coinbaseSellThresholdNum = config?.coinbaseSellThreshold ? Number(config.coinbaseSellThreshold) : Infinity;
+  const isCoinbaseBuyActive = config?.isActive && coinbaseData.buyQuantity >= coinbaseBuyThresholdNum;
+  const isCoinbaseSellActive = config?.isActive && coinbaseData.sellQuantity >= coinbaseSellThresholdNum;
 
   if (configLoading) {
     return (
@@ -65,10 +77,10 @@ export default function Dashboard() {
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/20 border border-white/5">
             <Wifi className={cn(
               "w-3 h-3 transition-colors", 
-              streamStatus === 'connected' ? "text-green-500" : "text-red-500"
+              binanceStatus === 'connected' && coinbaseStatus === 'connected' ? "text-green-500" : "text-red-500"
             )} />
             <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              {streamStatus}
+              Binance: {binanceStatus} | Coinbase: {coinbaseStatus}
             </span>
           </div>
           <ConfigPanel config={config} />
@@ -92,29 +104,57 @@ export default function Dashboard() {
               </Badge>
             </div>
             
-            <div className="h-[150px] w-full bg-black/20 rounded-xl overflow-hidden border border-white/5 relative">
-              <VolumeChart 
-                currentData={streamData} 
-                buyColor="hsl(var(--color-buy))"
-                sellColor="hsl(var(--color-sell))"
-              />
-              <div className="absolute top-2 right-2 text-[10px] font-mono text-white/30">
-                500ms Rolling Window
+            <div className="space-y-4">
+              <div>
+                <h4 className="text-xs font-semibold text-muted-foreground mb-2">Binance {config.symbol.toUpperCase()}</h4>
+                <div className="h-[100px] w-full bg-black/20 rounded-xl overflow-hidden border border-white/5 relative">
+                  <VolumeChart 
+                    currentData={binanceData} 
+                    buyColor="hsl(var(--color-buy))"
+                    sellColor="hsl(var(--color-sell))"
+                  />
+                  <div className="absolute top-1 right-1 text-[9px] font-mono text-white/30">500ms</div>
+                </div>
+                <div className="grid grid-cols-2 gap-2 pt-2">
+                  <div className="p-2 rounded-lg bg-black/20 border border-white/5">
+                    <p className="text-xs text-muted-foreground mb-0.5">Buy Qty</p>
+                    <p className="font-mono text-sm text-[hsl(var(--color-buy))]">
+                      {binanceData.buyQuantity.toFixed(8)}
+                    </p>
+                  </div>
+                  <div className="p-2 rounded-lg bg-black/20 border border-white/5">
+                    <p className="text-xs text-muted-foreground mb-0.5">Sell Qty</p>
+                    <p className="font-mono text-sm text-[hsl(var(--color-sell))]">
+                      {binanceData.sellQuantity.toFixed(8)}
+                    </p>
+                  </div>
+                </div>
               </div>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4 pt-2">
-              <div className="p-3 rounded-xl bg-black/20 border border-white/5">
-                <p className="text-xs text-muted-foreground mb-1">Buy Qty</p>
-                <p className="font-mono text-lg text-[hsl(var(--color-buy))]">
-                  {streamData.buyQuantity.toFixed(8)}
-                </p>
-              </div>
-              <div className="p-3 rounded-xl bg-black/20 border border-white/5">
-                <p className="text-xs text-muted-foreground mb-1">Sell Qty</p>
-                <p className="font-mono text-lg text-[hsl(var(--color-sell))]">
-                  {streamData.sellQuantity.toFixed(8)}
-                </p>
+
+              <div>
+                <h4 className="text-xs font-semibold text-muted-foreground mb-2">Coinbase {config.coinbaseSymbol}</h4>
+                <div className="h-[100px] w-full bg-black/20 rounded-xl overflow-hidden border border-white/5 relative">
+                  <VolumeChart 
+                    currentData={coinbaseData} 
+                    buyColor="hsl(var(--color-buy))"
+                    sellColor="hsl(var(--color-sell))"
+                  />
+                  <div className="absolute top-1 right-1 text-[9px] font-mono text-white/30">500ms</div>
+                </div>
+                <div className="grid grid-cols-2 gap-2 pt-2">
+                  <div className="p-2 rounded-lg bg-black/20 border border-white/5">
+                    <p className="text-xs text-muted-foreground mb-0.5">Buy Qty</p>
+                    <p className="font-mono text-sm text-[hsl(var(--color-buy))]">
+                      {coinbaseData.buyQuantity.toFixed(8)}
+                    </p>
+                  </div>
+                  <div className="p-2 rounded-lg bg-black/20 border border-white/5">
+                    <p className="text-xs text-muted-foreground mb-0.5">Sell Qty</p>
+                    <p className="font-mono text-sm text-[hsl(var(--color-sell))]">
+                      {coinbaseData.sellQuantity.toFixed(8)}
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -141,20 +181,44 @@ export default function Dashboard() {
 
         {/* Right Col: Big Indicators */}
         <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
-          <KeyIndicator 
-            label={config.buyKey} 
-            active={isBuyActive} 
-            type="buy"
-            threshold={buyThresholdNum}
-            currentValue={streamData.buyQuantity}
-          />
-          <KeyIndicator 
-            label={config.sellKey} 
-            active={isSellActive} 
-            type="sell"
-            threshold={sellThresholdNum}
-            currentValue={streamData.sellQuantity}
-          />
+          <div className="space-y-4">
+            <div className="text-xs font-semibold text-muted-foreground">Binance Triggers</div>
+            <div className="grid grid-cols-1 gap-4">
+              <KeyIndicator 
+                label={config.buyKey} 
+                active={isBinanceBuyActive} 
+                type="buy"
+                threshold={buyThresholdNum}
+                currentValue={binanceData.buyQuantity}
+              />
+              <KeyIndicator 
+                label={config.sellKey} 
+                active={isBinanceSellActive} 
+                type="sell"
+                threshold={sellThresholdNum}
+                currentValue={binanceData.sellQuantity}
+              />
+            </div>
+          </div>
+          <div className="space-y-4">
+            <div className="text-xs font-semibold text-muted-foreground">Coinbase Triggers</div>
+            <div className="grid grid-cols-1 gap-4">
+              <KeyIndicator 
+                label={config.coinbaseBuyKey} 
+                active={isCoinbaseBuyActive} 
+                type="buy"
+                threshold={coinbaseBuyThresholdNum}
+                currentValue={coinbaseData.buyQuantity}
+              />
+              <KeyIndicator 
+                label={config.coinbaseSellKey} 
+                active={isCoinbaseSellActive} 
+                type="sell"
+                threshold={coinbaseSellThresholdNum}
+                currentValue={coinbaseData.sellQuantity}
+              />
+            </div>
+          </div>
         </div>
       </main>
     </div>
