@@ -16,8 +16,10 @@ export default function Dashboard() {
   );
 
   // Derive active states locally based on thresholds
-  const isBuyActive = config?.isActive && streamData.buyQuantity >= (config?.buyThreshold || Infinity);
-  const isSellActive = config?.isActive && streamData.sellQuantity >= (config?.sellThreshold || Infinity);
+  const buyThresholdNum = config?.buyThreshold ? Number(config.buyThreshold) : Infinity;
+  const sellThresholdNum = config?.sellThreshold ? Number(config.sellThreshold) : Infinity;
+  const isBuyActive = config?.isActive && streamData.buyQuantity >= buyThresholdNum;
+  const isSellActive = config?.isActive && streamData.sellQuantity >= sellThresholdNum;
 
   if (configLoading) {
     return (
@@ -143,14 +145,14 @@ export default function Dashboard() {
             label={config.buyKey} 
             active={isBuyActive} 
             type="buy"
-            threshold={config.buyThreshold}
+            threshold={buyThresholdNum}
             currentValue={streamData.buyQuantity}
           />
           <KeyIndicator 
             label={config.sellKey} 
             active={isSellActive} 
             type="sell"
-            threshold={config.sellThreshold}
+            threshold={sellThresholdNum}
             currentValue={streamData.sellQuantity}
           />
         </div>

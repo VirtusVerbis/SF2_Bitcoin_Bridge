@@ -73,7 +73,7 @@ export function KeyIndicator({ label, active, type, threshold, currentValue }: K
             {currentValue.toFixed(8)} <span className="text-sm font-normal text-muted-foreground">qty</span>
           </p>
           <p className="text-xs text-muted-foreground">
-            Threshold: {threshold}
+            Threshold: {Number(threshold).toFixed(8)}
           </p>
         </div>
       </div>
