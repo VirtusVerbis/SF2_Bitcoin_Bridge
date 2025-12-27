@@ -33,8 +33,8 @@ interface ConfigPanelProps {
 
 // We need to extend the schema for the form because input type="number" returns strings
 const formSchema = insertConfigurationSchema.extend({
-  buyThreshold: z.coerce.number().min(1),
-  sellThreshold: z.coerce.number().min(1),
+  buyThreshold: z.coerce.number().gt(0),
+  sellThreshold: z.coerce.number().gt(0),
 });
 
 export function ConfigPanel({ config }: ConfigPanelProps) {
@@ -126,7 +126,7 @@ export function ConfigPanel({ config }: ConfigPanelProps) {
                     <FormItem>
                       <FormLabel className="text-[hsl(var(--color-buy))]">Buy Threshold</FormLabel>
                       <FormControl>
-                        <Input type="number" {...field} />
+                        <Input type="number" step="0.01" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -155,7 +155,7 @@ export function ConfigPanel({ config }: ConfigPanelProps) {
                     <FormItem>
                       <FormLabel className="text-[hsl(var(--color-sell))]">Sell Threshold</FormLabel>
                       <FormControl>
-                        <Input type="number" {...field} />
+                        <Input type="number" step="0.01" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
