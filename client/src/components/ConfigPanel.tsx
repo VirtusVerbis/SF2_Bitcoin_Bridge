@@ -126,7 +126,7 @@ export function ConfigPanel({ config }: ConfigPanelProps) {
                     <FormItem>
                       <FormLabel className="text-[hsl(var(--color-buy))]">Buy Threshold</FormLabel>
                       <FormControl>
-                        <Input type="number" step="0.01" {...field} />
+                        <Input type="number" step="0.00000001" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -155,7 +155,7 @@ export function ConfigPanel({ config }: ConfigPanelProps) {
                     <FormItem>
                       <FormLabel className="text-[hsl(var(--color-sell))]">Sell Threshold</FormLabel>
                       <FormControl>
-                        <Input type="number" step="0.01" {...field} />
+                        <Input type="number" step="0.00000001" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

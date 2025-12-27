@@ -105,13 +105,13 @@ export default function Dashboard() {
               <div className="p-3 rounded-xl bg-black/20 border border-white/5">
                 <p className="text-xs text-muted-foreground mb-1">Buy Qty</p>
                 <p className="font-mono text-lg text-[hsl(var(--color-buy))]">
-                  {streamData.buyQuantity.toFixed(2)}
+                  {streamData.buyQuantity.toFixed(8)}
                 </p>
               </div>
               <div className="p-3 rounded-xl bg-black/20 border border-white/5">
                 <p className="text-xs text-muted-foreground mb-1">Sell Qty</p>
                 <p className="font-mono text-lg text-[hsl(var(--color-sell))]">
-                  {streamData.sellQuantity.toFixed(2)}
+                  {streamData.sellQuantity.toFixed(8)}
                 </p>
               </div>
             </div>

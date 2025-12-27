@@ -5,8 +5,8 @@ import { z } from "zod";
 export const configurations = pgTable("configurations", {
   id: serial("id").primaryKey(),
   symbol: text("symbol").notNull().default("btcusdt"),
-  buyThreshold: numeric("buy_threshold", { precision: 10, scale: 2 }).notNull().default("10"),
-  sellThreshold: numeric("sell_threshold", { precision: 10, scale: 2 }).notNull().default("10"),
+  buyThreshold: numeric("buy_threshold", { precision: 18, scale: 8 }).notNull().default("10"),
+  sellThreshold: numeric("sell_threshold", { precision: 18, scale: 8 }).notNull().default("10"),
   buyKey: text("buy_key").notNull().default("x"),
   sellKey: text("sell_key").notNull().default("y"),
   isActive: boolean("is_active").notNull().default(true),
