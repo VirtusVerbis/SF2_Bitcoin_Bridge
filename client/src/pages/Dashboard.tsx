@@ -16,8 +16,8 @@ export default function Dashboard() {
   );
 
   // Derive active states locally based on thresholds
-  const isBuyActive = config?.isActive && streamData.buyVolume >= (config?.buyThreshold || Infinity);
-  const isSellActive = config?.isActive && streamData.sellVolume >= (config?.sellThreshold || Infinity);
+  const isBuyActive = config?.isActive && streamData.buyQuantity >= (config?.buyThreshold || Infinity);
+  const isSellActive = config?.isActive && streamData.sellQuantity >= (config?.sellThreshold || Infinity);
 
   if (configLoading) {
     return (
@@ -103,15 +103,15 @@ export default function Dashboard() {
             
             <div className="grid grid-cols-2 gap-4 pt-2">
               <div className="p-3 rounded-xl bg-black/20 border border-white/5">
-                <p className="text-xs text-muted-foreground mb-1">Buy Vol</p>
+                <p className="text-xs text-muted-foreground mb-1">Buy Qty</p>
                 <p className="font-mono text-lg text-[hsl(var(--color-buy))]">
-                  {streamData.buyVolume.toFixed(2)}
+                  {streamData.buyQuantity.toFixed(2)}
                 </p>
               </div>
               <div className="p-3 rounded-xl bg-black/20 border border-white/5">
-                <p className="text-xs text-muted-foreground mb-1">Sell Vol</p>
+                <p className="text-xs text-muted-foreground mb-1">Sell Qty</p>
                 <p className="font-mono text-lg text-[hsl(var(--color-sell))]">
-                  {streamData.sellVolume.toFixed(2)}
+                  {streamData.sellQuantity.toFixed(2)}
                 </p>
               </div>
             </div>
@@ -144,14 +144,14 @@ export default function Dashboard() {
             active={isBuyActive} 
             type="buy"
             threshold={config.buyThreshold}
-            currentValue={streamData.buyVolume}
+            currentValue={streamData.buyQuantity}
           />
           <KeyIndicator 
             label={config.sellKey} 
             active={isSellActive} 
             type="sell"
             threshold={config.sellThreshold}
-            currentValue={streamData.sellVolume}
+            currentValue={streamData.sellQuantity}
           />
         </div>
       </main>

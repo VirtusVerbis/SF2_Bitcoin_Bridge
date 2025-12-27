@@ -21,8 +21,8 @@ export function VolumeChart({ currentData, buyColor, sellColor }: VolumeChartPro
     setHistory(prev => {
       const newPoint = {
         time: Date.now(),
-        buy: currentData.buyVolume,
-        sell: currentData.sellVolume
+        buy: currentData.buyQuantity,
+        sell: currentData.sellQuantity
       };
       // Keep last 50 points (approx 25 seconds of data at 500ms update rate)
       const newHistory = [...prev, newPoint];

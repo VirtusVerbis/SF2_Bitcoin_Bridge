@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Binance Volume to MAME Keyboard Bridge
-Connects to Binance WebSocket for real-time volume data and simulates keyboard presses
+Binance Quantity to MAME Keyboard Bridge
+Connects to Binance WebSocket for real-time quantity data and simulates keyboard presses
 for MAME arcade controls based on configurable buy/sell thresholds.
 
 Required packages:
@@ -29,8 +29,8 @@ class BinanceMAMEBridge:
         self.keyboard = Controller()
         self.config = None
         self.ws = None
-        self.buy_volume = 0
-        self.sell_volume = 0
+        self.buy_quantity = 0
+        self.sell_quantity = 0
         self.last_buy_press = 0
         self.last_sell_press = 0
         self.press_cooldown = 0.5  # Prevent rapid repeated presses
@@ -93,16 +93,16 @@ class BinanceMAMEBridge:
             quantity = float(data.get('q', 0))
             is_buyer_maker = data.get('m', False)
             
-            # Accumulate volume (reset every ~1 second in practice due to message frequency)
+            # Accumulate quantity (reset every ~1 second in practice due to message frequency)
             if is_buyer_maker:
-                self.sell_volume += quantity
+                self.sell_quantity += quantity
             else:
-                self.buy_volume += quantity
+                self.buy_quantity += quantity
             
             # Check thresholds and press keys
             self.check_and_press(price, quantity)
             
-            # Reset volumes periodically (every 100 messages ~1 second)
+            # Reset quantities periodically (every 100 messages ~1 second)
             if 'E' in data:
                 event_time = data['E']
                 # You could implement time-based reset here
@@ -130,19 +130,19 @@ class BinanceMAMEBridge:
         
         current_time = time.time()
         
-        # Check buy threshold (sell volume)
-        if self.sell_volume >= self.config['sellThreshold']:
+        # Check buy threshold (sell quantity)
+        if self.sell_quantity >= self.config['sellThreshold']:
             if current_time - self.last_sell_press > self.press_cooldown:
                 self.press_key(self.config['sellKey'])
                 self.last_sell_press = current_time
-                self.sell_volume = 0  # Reset after press
+                self.sell_quantity = 0  # Reset after press
         
-        # Check sell threshold (buy volume)
-        if self.buy_volume >= self.config['buyThreshold']:
+        # Check sell threshold (buy quantity)
+        if self.buy_quantity >= self.config['buyThreshold']:
             if current_time - self.last_buy_press > self.press_cooldown:
                 self.press_key(self.config['buyKey'])
                 self.last_buy_press = current_time
-                self.buy_volume = 0  # Reset after press
+                self.buy_quantity = 0  # Reset after press
     
     def press_key(self, key_char):
         """Simulate a keyboard key press"""
@@ -150,12 +150,12 @@ class BinanceMAMEBridge:
             key_char = key_char.lower().strip()
             
             if key_char == 'x':
-                logger.info(f"Pressing X (Buy) | Price: BTC volume triggered")
+                logger.info(f"Pressing X (Buy) | Price: BTC quantity triggered")
                 self.keyboard.press('x')
                 time.sleep(0.05)
                 self.keyboard.release('x')
             elif key_char == 'y':
-                logger.info(f"Pressing Y (Sell) | Price: BTC volume triggered")
+                logger.info(f"Pressing Y (Sell) | Price: BTC quantity triggered")
                 self.keyboard.press('y')
                 time.sleep(0.05)
                 self.keyboard.release('y')

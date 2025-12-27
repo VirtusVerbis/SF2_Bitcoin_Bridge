@@ -15,13 +15,13 @@ type Trade = {
 };
 
 export type VolumeData = {
-  buyVolume: number;
-  sellVolume: number;
+  buyQuantity: number;
+  sellQuantity: number;
   lastPrice: number;
 };
 
 export function useBinanceSocket(symbol: string, isEnabled: boolean = true) {
-  const [data, setData] = useState<VolumeData>({ buyVolume: 0, sellVolume: 0, lastPrice: 0 });
+  const [data, setData] = useState<VolumeData>({ buyQuantity: 0, sellQuantity: 0, lastPrice: 0 });
   const [status, setStatus] = useState<'connecting' | 'connected' | 'disconnected' | 'error'>('disconnected');
   const wsRef = useRef<WebSocket | null>(null);
   
@@ -33,7 +33,7 @@ export function useBinanceSocket(symbol: string, isEnabled: boolean = true) {
     if (!isEnabled || !symbol) return;
 
     // Reset state on symbol change
-    setData({ buyVolume: 0, sellVolume: 0, lastPrice: 0 });
+    setData({ buyQuantity: 0, sellQuantity: 0, lastPrice: 0 });
     accumulators.current = { buy: 0, sell: 0 };
     
     const wsUrl = `wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@aggTrade`;
@@ -64,14 +64,14 @@ export function useBinanceSocket(symbol: string, isEnabled: boolean = true) {
         const now = Date.now();
         if (now - lastReset.current > 500) {
           setData({
-            buyVolume: accumulators.current.buy,
-            sellVolume: accumulators.current.sell,
+            buyQuantity: accumulators.current.buy,
+            sellQuantity: accumulators.current.sell,
             lastPrice: price
           });
           accumulators.current = { buy: 0, sell: 0 };
           lastReset.current = now;
         } else {
-            // Update price immediately even if volume hasn't reset
+            // Update price immediately even if quantity hasn't reset
              setData(prev => ({
                 ...prev,
                 lastPrice: price
