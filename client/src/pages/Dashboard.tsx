@@ -68,7 +68,7 @@ export default function Dashboard() {
             <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground">
               <span className="uppercase">{config.symbol}</span>
               <span className="w-1 h-1 rounded-full bg-white/20" />
-              <span>{streamData.lastPrice > 0 ? `$${streamData.lastPrice.toLocaleString()}` : '---'}</span>
+              <span>{binanceData.lastPrice > 0 ? `$${binanceData.lastPrice.toLocaleString()}` : '---'}</span>
             </div>
           </div>
         </div>
