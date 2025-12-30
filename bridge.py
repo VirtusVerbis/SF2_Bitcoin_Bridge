@@ -30,17 +30,51 @@ logger = logging.getLogger(__name__)
 # Windows SendInput API structures and constants
 INPUT_KEYBOARD = 1
 KEYEVENTF_KEYUP = 0x0002
+KEYEVENTF_SCANCODE = 0x0008
 
-# Virtual key codes for letter keys
-VK_CODES = {
-    'a': 0x41, 'b': 0x42, 'c': 0x43, 'd': 0x44, 'e': 0x45, 'f': 0x46,
-    'g': 0x47, 'h': 0x48, 'i': 0x49, 'j': 0x4A, 'k': 0x4B, 'l': 0x4C,
-    'm': 0x4D, 'n': 0x4E, 'o': 0x4F, 'p': 0x50, 'q': 0x51, 'r': 0x52,
-    's': 0x53, 't': 0x54, 'u': 0x55, 'v': 0x56, 'w': 0x57, 'x': 0x58,
-    'y': 0x59, 'z': 0x5A,
-    '0': 0x30, '1': 0x31, '2': 0x32, '3': 0x33, '4': 0x34,
-    '5': 0x35, '6': 0x36, '7': 0x37, '8': 0x38, '9': 0x39,
-    'space': 0x20, 'enter': 0x0D, 'escape': 0x1B, 'tab': 0x09,
+# Virtual key codes and scan codes for letter keys
+# Scan codes are needed for MAME's DirectInput mode (in-game)
+KEY_CODES = {
+    'a': {'vk': 0x41, 'scan': 0x1E},
+    'b': {'vk': 0x42, 'scan': 0x30},
+    'c': {'vk': 0x43, 'scan': 0x2E},
+    'd': {'vk': 0x44, 'scan': 0x20},
+    'e': {'vk': 0x45, 'scan': 0x12},
+    'f': {'vk': 0x46, 'scan': 0x21},
+    'g': {'vk': 0x47, 'scan': 0x22},
+    'h': {'vk': 0x48, 'scan': 0x23},
+    'i': {'vk': 0x49, 'scan': 0x17},
+    'j': {'vk': 0x4A, 'scan': 0x24},
+    'k': {'vk': 0x4B, 'scan': 0x25},
+    'l': {'vk': 0x4C, 'scan': 0x26},
+    'm': {'vk': 0x4D, 'scan': 0x32},
+    'n': {'vk': 0x4E, 'scan': 0x31},
+    'o': {'vk': 0x4F, 'scan': 0x18},
+    'p': {'vk': 0x50, 'scan': 0x19},
+    'q': {'vk': 0x51, 'scan': 0x10},
+    'r': {'vk': 0x52, 'scan': 0x13},
+    's': {'vk': 0x53, 'scan': 0x1F},
+    't': {'vk': 0x54, 'scan': 0x14},
+    'u': {'vk': 0x55, 'scan': 0x16},
+    'v': {'vk': 0x56, 'scan': 0x2F},
+    'w': {'vk': 0x57, 'scan': 0x11},
+    'x': {'vk': 0x58, 'scan': 0x2D},
+    'y': {'vk': 0x59, 'scan': 0x15},
+    'z': {'vk': 0x5A, 'scan': 0x2C},
+    '0': {'vk': 0x30, 'scan': 0x0B},
+    '1': {'vk': 0x31, 'scan': 0x02},
+    '2': {'vk': 0x32, 'scan': 0x03},
+    '3': {'vk': 0x33, 'scan': 0x04},
+    '4': {'vk': 0x34, 'scan': 0x05},
+    '5': {'vk': 0x35, 'scan': 0x06},
+    '6': {'vk': 0x36, 'scan': 0x07},
+    '7': {'vk': 0x37, 'scan': 0x08},
+    '8': {'vk': 0x38, 'scan': 0x09},
+    '9': {'vk': 0x39, 'scan': 0x0A},
+    'space': {'vk': 0x20, 'scan': 0x39},
+    'enter': {'vk': 0x0D, 'scan': 0x1C},
+    'escape': {'vk': 0x1B, 'scan': 0x01},
+    'tab': {'vk': 0x09, 'scan': 0x0F},
 }
 
 class KEYBDINPUT(Structure):
@@ -294,23 +328,26 @@ class CryptoMAMEBridge:
                 self.coinbase_sell_quantity = 0
     
     def press_key(self, key_char, source=""):
-        """Simulate a keyboard key press using Windows SendInput API"""
+        """Simulate a keyboard key press using Windows SendInput API (DirectInput compatible for MAME)"""
         try:
             key_char = key_char.lower().strip()
             
-            # Get virtual key code
-            vk = VK_CODES.get(key_char)
-            if not vk:
+            # Get virtual key and scan codes
+            key_info = KEY_CODES.get(key_char)
+            if not key_info:
                 logger.error(f"Unknown key: {key_char}")
                 return
             
-            logger.info(f"[{source}] Pressing {key_char.upper()}")
+            vk = key_info['vk']
+            scan = key_info['scan']
             
-            # Create key down input
+            logger.info(f"[{source}] Pressing {key_char.upper()} (VK={hex(vk)}, Scan={hex(scan)})")
+            
+            # Create key down input with both virtual key and scan code
             inp_down = INPUT()
             inp_down.type = INPUT_KEYBOARD
             inp_down.ii.ki.wVk = vk
-            inp_down.ii.ki.wScan = 0
+            inp_down.ii.ki.wScan = scan
             inp_down.ii.ki.dwFlags = 0
             inp_down.ii.ki.time = 0
             inp_down.ii.ki.dwExtraInfo = 0
@@ -320,14 +357,14 @@ class CryptoMAMEBridge:
             if result_down != 1:
                 logger.warning(f"SendInput key down failed (returned {result_down})")
             
-            # Hold key briefly
-            time.sleep(0.05)
+            # Hold key longer for MAME's DirectInput (100ms minimum)
+            time.sleep(0.1)
             
-            # Create key up input
+            # Create key up input with both virtual key and scan code
             inp_up = INPUT()
             inp_up.type = INPUT_KEYBOARD
             inp_up.ii.ki.wVk = vk
-            inp_up.ii.ki.wScan = 0
+            inp_up.ii.ki.wScan = scan
             inp_up.ii.ki.dwFlags = KEYEVENTF_KEYUP
             inp_up.ii.ki.time = 0
             inp_up.ii.ki.dwExtraInfo = 0
