@@ -328,9 +328,9 @@ class CryptoMAMEBridge:
                 self.coinbase_sell_quantity = 0
     
     def press_key(self, key_char, source=""):
-        """Simulate a keyboard key press using Windows SendInput API (DirectInput compatible for MAME)"""
+        """Simulate an uppercase keyboard key press using Windows SendInput API (DirectInput compatible for MAME)"""
         try:
-            key_char = key_char.lower().strip()
+            key_char = key_char.upper().strip()
             
             # Get virtual key and scan codes
             key_info = KEY_CODES.get(key_char)
@@ -341,7 +341,19 @@ class CryptoMAMEBridge:
             vk = key_info['vk']
             scan = key_info['scan']
             
-            logger.info(f"[{source}] Pressing {key_char.upper()} (VK={hex(vk)}, Scan={hex(scan)})")
+            logger.info(f"[{source}] Pressing {key_char} (VK={hex(vk)}, Scan={hex(scan)})")
+            
+            # Hold Shift for uppercase
+            shift_down = INPUT()
+            shift_down.type = INPUT_KEYBOARD
+            shift_down.ii.ki.wVk = 0x10  # VK_SHIFT
+            shift_down.ii.ki.wScan = 0x2A
+            shift_down.ii.ki.dwFlags = 0
+            shift_down.ii.ki.time = 0
+            shift_down.ii.ki.dwExtraInfo = 0
+            windll.user32.SendInput(1, byref(shift_down), ctypes.sizeof(INPUT))
+            
+            time.sleep(0.05)
             
             # Create key down input with both virtual key and scan code
             inp_down = INPUT()
@@ -373,6 +385,18 @@ class CryptoMAMEBridge:
             result_up = windll.user32.SendInput(1, byref(inp_up), ctypes.sizeof(INPUT))
             if result_up != 1:
                 logger.warning(f"SendInput key up failed (returned {result_up})")
+            
+            time.sleep(0.05)
+            
+            # Release Shift
+            shift_up = INPUT()
+            shift_up.type = INPUT_KEYBOARD
+            shift_up.ii.ki.wVk = 0x10  # VK_SHIFT
+            shift_up.ii.ki.wScan = 0x2A
+            shift_up.ii.ki.dwFlags = KEYEVENTF_KEYUP
+            shift_up.ii.ki.time = 0
+            shift_up.ii.ki.dwExtraInfo = 0
+            windll.user32.SendInput(1, byref(shift_up), ctypes.sizeof(INPUT))
             
         except Exception as e:
             logger.error(f"Error pressing key '{key_char}': {e}")

@@ -45,20 +45,37 @@ class INPUT(Structure):
     ]
 
 KEY_CODES = {
-    'x': {'vk': 0x58, 'scan': 0x2D},
-    'y': {'vk': 0x59, 'scan': 0x15},
-    'a': {'vk': 0x41, 'scan': 0x1E},
-    'b': {'vk': 0x42, 'scan': 0x30},
+    'X': {'vk': 0x58, 'scan': 0x2D},
+    'Y': {'vk': 0x59, 'scan': 0x15},
+    'A': {'vk': 0x41, 'scan': 0x1E},
+    'B': {'vk': 0x42, 'scan': 0x30},
 }
 
-def test_key(key_char, key_name):
-    """Test a single key press with scan codes"""
+def press_key_with_shift(key_char, key_name):
+    """Test a single uppercase key press with Shift held"""
+    if key_char not in KEY_CODES:
+        print(f"Unknown key: {key_char}")
+        return
+    
     key_info = KEY_CODES[key_char]
     vk = key_info['vk']
     scan = key_info['scan']
     
-    print(f"Testing {key_name} (VK={hex(vk)}, Scan={hex(scan)})... click in Notepad window now")
+    print(f"Testing {key_name} ({key_char})... click in Notepad window now")
     time.sleep(1)
+    
+    # Press and hold Shift (VK_SHIFT = 0x10, scan = 0x2A)
+    shift_inp_down = INPUT()
+    shift_inp_down.type = INPUT_KEYBOARD
+    shift_inp_down.ii.ki.wVk = 0x10
+    shift_inp_down.ii.ki.wScan = 0x2A
+    shift_inp_down.ii.ki.dwFlags = 0
+    shift_inp_down.ii.ki.time = 0
+    shift_inp_down.ii.ki.dwExtraInfo = 0
+    windll.user32.SendInput(1, byref(shift_inp_down), ctypes.sizeof(INPUT))
+    print(f"  Shift down")
+    
+    time.sleep(0.05)
     
     # Key down
     inp = INPUT()
@@ -69,9 +86,9 @@ def test_key(key_char, key_name):
     inp.ii.ki.time = 0
     inp.ii.ki.dwExtraInfo = 0
     result = windll.user32.SendInput(1, byref(inp), ctypes.sizeof(INPUT))
-    print(f"  Key down result: {result}")
+    print(f"  Key {key_char} down result: {result}")
     
-    # Hold key longer (for DirectInput compatibility)
+    # Hold key
     time.sleep(0.1)
     
     # Key up
@@ -83,16 +100,29 @@ def test_key(key_char, key_name):
     inp2.ii.ki.time = 0
     inp2.ii.ki.dwExtraInfo = 0
     result2 = windll.user32.SendInput(1, byref(inp2), ctypes.sizeof(INPUT))
-    print(f"  Key up result: {result2}")
+    print(f"  Key {key_char} up result: {result2}")
+    
+    time.sleep(0.05)
+    
+    # Release Shift
+    shift_inp_up = INPUT()
+    shift_inp_up.type = INPUT_KEYBOARD
+    shift_inp_up.ii.ki.wVk = 0x10
+    shift_inp_up.ii.ki.wScan = 0x2A
+    shift_inp_up.ii.ki.dwFlags = KEYEVENTF_KEYUP
+    shift_inp_up.ii.ki.time = 0
+    shift_inp_up.ii.ki.dwExtraInfo = 0
+    windll.user32.SendInput(1, byref(shift_inp_up), ctypes.sizeof(INPUT))
+    print(f"  Shift up")
     print()
 
 if __name__ == "__main__":
-    print("=== Windows SendInput Keyboard Test (with Scan Codes) ===")
+    print("=== Windows SendInput Keyboard Test (Uppercase with Shift) ===")
     print("Open Notepad and keep focus on it\n")
     
-    test_key('x', "X (Binance Buy)")
-    test_key('y', "Y (Binance Sell)")
-    test_key('a', "A (Coinbase Buy)")
-    test_key('b', "B (Coinbase Sell)")
+    press_key_with_shift('X', "X (Binance Buy)")
+    press_key_with_shift('Y', "Y (Binance Sell)")
+    press_key_with_shift('A', "A (Coinbase Buy)")
+    press_key_with_shift('B', "B (Coinbase Sell)")
     
     print("Test complete!")
