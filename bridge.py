@@ -4,8 +4,10 @@ Crypto Quantity to MAME Keyboard Bridge
 Connects to Binance and Coinbase WebSockets for real-time quantity data and simulates keyboard presses
 for MAME arcade controls based on configurable buy/sell thresholds.
 
+Uses Windows SendInput API for direct HID keyboard input compatible with MAME.
+
 Required packages:
-  pip install pynput websocket-client requests
+  pip install websocket-client requests
 """
 
 import json
@@ -13,8 +15,9 @@ import time
 import requests
 import logging
 import threading
+import ctypes
+from ctypes import c_uint, c_int, c_char, Structure, POINTER, byref, windll
 from datetime import datetime
-from pynput.keyboard import Controller, Key
 from websocket import WebSocketApp, WebSocketException
 
 # Configure logging
@@ -24,10 +27,37 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# Windows SendInput API structures and constants
+INPUT_KEYBOARD = 1
+KEYEVENTF_KEYUP = 0x0002
+KEYEVENTF_UNICODE = 0x0004
+
+# Virtual key codes for letter keys
+VK_CODES = {
+    'a': 0x41, 'b': 0x42, 'c': 0x43, 'd': 0x44, 'e': 0x45, 'f': 0x46,
+    'g': 0x47, 'h': 0x48, 'i': 0x49, 'j': 0x4A, 'k': 0x4B, 'l': 0x4C,
+    'm': 0x4D, 'n': 0x4E, 'o': 0x4F, 'p': 0x50, 'q': 0x51, 'r': 0x52,
+    's': 0x53, 't': 0x54, 'u': 0x55, 'v': 0x56, 'w': 0x57, 'x': 0x58,
+    'y': 0x59, 'z': 0x5A,
+    '0': 0x30, '1': 0x31, '2': 0x32, '3': 0x33, '4': 0x34,
+    '5': 0x35, '6': 0x36, '7': 0x37, '8': 0x38, '9': 0x39,
+    'space': 0x20, 'enter': 0x0D, 'escape': 0x1B, 'tab': 0x09,
+}
+
+class KEYBDINPUT(Structure):
+    _fields_ = [("wVk", c_uint),
+                ("wScan", c_uint),
+                ("dwFlags", c_uint),
+                ("time", c_uint),
+                ("dwExtraInfo", ctypes.c_void_p)]
+
+class INPUT(Structure):
+    _fields_ = [("type", c_uint),
+                ("ki", KEYBDINPUT)]
+
 class CryptoMAMEBridge:
     def __init__(self, dashboard_url="http://localhost:5000"):
         self.dashboard_url = dashboard_url
-        self.keyboard = Controller()
         self.config = None
         self.binance_ws = None
         self.coinbase_ws = None
@@ -237,13 +267,51 @@ class CryptoMAMEBridge:
                 self.coinbase_sell_quantity = 0
     
     def press_key(self, key_char, source=""):
-        """Simulate a keyboard key press"""
+        """Simulate a keyboard key press using Windows SendInput API"""
         try:
             key_char = key_char.lower().strip()
+            
+            # Get virtual key code
+            vk = VK_CODES.get(key_char)
+            if not vk:
+                logger.error(f"Unknown key: {key_char}")
+                return
+            
             logger.info(f"[{source}] Pressing {key_char.upper()}")
-            self.keyboard.press(key_char)
+            
+            # Create keyboard input structure for key down
+            kbd_input_down = KEYBDINPUT()
+            kbd_input_down.wVk = vk
+            kbd_input_down.wScan = 0
+            kbd_input_down.dwFlags = 0
+            kbd_input_down.time = 0
+            kbd_input_down.dwExtraInfo = None
+            
+            input_down = INPUT()
+            input_down.type = INPUT_KEYBOARD
+            input_down.ki = kbd_input_down
+            
+            # Send key down
+            windll.user32.SendInput(1, byref(input_down), ctypes.sizeof(input_down))
+            
+            # Hold key briefly
             time.sleep(0.05)
-            self.keyboard.release(key_char)
+            
+            # Create keyboard input structure for key up
+            kbd_input_up = KEYBDINPUT()
+            kbd_input_up.wVk = vk
+            kbd_input_up.wScan = 0
+            kbd_input_up.dwFlags = KEYEVENTF_KEYUP
+            kbd_input_up.time = 0
+            kbd_input_up.dwExtraInfo = None
+            
+            input_up = INPUT()
+            input_up.type = INPUT_KEYBOARD
+            input_up.ki = kbd_input_up
+            
+            # Send key up
+            windll.user32.SendInput(1, byref(input_up), ctypes.sizeof(input_up))
+            
         except Exception as e:
             logger.error(f"Error pressing key '{key_char}': {e}")
     
