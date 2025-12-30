@@ -16,7 +16,7 @@ import requests
 import logging
 import threading
 import ctypes
-from ctypes import c_uint, c_int, c_char, Structure, POINTER, byref, windll
+from ctypes import c_uint, c_uint64, c_int, c_char, Structure, Union, POINTER, byref, windll
 from datetime import datetime
 from websocket import WebSocketApp, WebSocketException
 
@@ -30,7 +30,6 @@ logger = logging.getLogger(__name__)
 # Windows SendInput API structures and constants
 INPUT_KEYBOARD = 1
 KEYEVENTF_KEYUP = 0x0002
-KEYEVENTF_UNICODE = 0x0004
 
 # Virtual key codes for letter keys
 VK_CODES = {
@@ -45,15 +44,43 @@ VK_CODES = {
 }
 
 class KEYBDINPUT(Structure):
-    _fields_ = [("wVk", c_uint),
-                ("wScan", c_uint),
-                ("dwFlags", c_uint),
-                ("time", c_uint),
-                ("dwExtraInfo", ctypes.c_void_p)]
+    _fields_ = [
+        ("wVk", c_uint),
+        ("wScan", c_uint),
+        ("dwFlags", c_uint),
+        ("time", c_uint),
+        ("dwExtraInfo", ctypes.c_void_p)
+    ]
+
+class MOUSEINPUT(Structure):
+    _fields_ = [
+        ("dx", c_int),
+        ("dy", c_int),
+        ("mouseData", c_uint),
+        ("dwFlags", c_uint),
+        ("time", c_uint),
+        ("dwExtraInfo", ctypes.c_void_p)
+    ]
+
+class HARDWAREINPUT(Structure):
+    _fields_ = [
+        ("uMsg", c_uint),
+        ("wParamL", c_uint),
+        ("wParamH", c_uint)
+    ]
+
+class INPUT_UNION(Union):
+    _fields_ = [
+        ("mi", MOUSEINPUT),
+        ("ki", KEYBDINPUT),
+        ("hi", HARDWAREINPUT)
+    ]
 
 class INPUT(Structure):
-    _fields_ = [("type", c_uint),
-                ("ki", KEYBDINPUT)]
+    _fields_ = [
+        ("type", c_uint),
+        ("ii", INPUT_UNION)
+    ]
 
 class CryptoMAMEBridge:
     def __init__(self, dashboard_url="http://localhost:5000"):
@@ -279,38 +306,36 @@ class CryptoMAMEBridge:
             
             logger.info(f"[{source}] Pressing {key_char.upper()}")
             
-            # Create keyboard input structure for key down
-            kbd_input_down = KEYBDINPUT()
-            kbd_input_down.wVk = vk
-            kbd_input_down.wScan = 0
-            kbd_input_down.dwFlags = 0
-            kbd_input_down.time = 0
-            kbd_input_down.dwExtraInfo = None
-            
-            input_down = INPUT()
-            input_down.type = INPUT_KEYBOARD
-            input_down.ki = kbd_input_down
+            # Create key down input
+            inp_down = INPUT()
+            inp_down.type = INPUT_KEYBOARD
+            inp_down.ii.ki.wVk = vk
+            inp_down.ii.ki.wScan = 0
+            inp_down.ii.ki.dwFlags = 0
+            inp_down.ii.ki.time = 0
+            inp_down.ii.ki.dwExtraInfo = 0
             
             # Send key down
-            windll.user32.SendInput(1, byref(input_down), ctypes.sizeof(input_down))
+            result_down = windll.user32.SendInput(1, byref(inp_down), ctypes.sizeof(INPUT))
+            if result_down != 1:
+                logger.warning(f"SendInput key down failed (returned {result_down})")
             
             # Hold key briefly
             time.sleep(0.05)
             
-            # Create keyboard input structure for key up
-            kbd_input_up = KEYBDINPUT()
-            kbd_input_up.wVk = vk
-            kbd_input_up.wScan = 0
-            kbd_input_up.dwFlags = KEYEVENTF_KEYUP
-            kbd_input_up.time = 0
-            kbd_input_up.dwExtraInfo = None
-            
-            input_up = INPUT()
-            input_up.type = INPUT_KEYBOARD
-            input_up.ki = kbd_input_up
+            # Create key up input
+            inp_up = INPUT()
+            inp_up.type = INPUT_KEYBOARD
+            inp_up.ii.ki.wVk = vk
+            inp_up.ii.ki.wScan = 0
+            inp_up.ii.ki.dwFlags = KEYEVENTF_KEYUP
+            inp_up.ii.ki.time = 0
+            inp_up.ii.ki.dwExtraInfo = 0
             
             # Send key up
-            windll.user32.SendInput(1, byref(input_up), ctypes.sizeof(input_up))
+            result_up = windll.user32.SendInput(1, byref(inp_up), ctypes.sizeof(INPUT))
+            if result_up != 1:
+                logger.warning(f"SendInput key up failed (returned {result_up})")
             
         except Exception as e:
             logger.error(f"Error pressing key '{key_char}': {e}")
