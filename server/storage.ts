@@ -3,7 +3,6 @@ import {
   configurations,
   type Configuration,
   type InsertConfiguration,
-  type UpdateConfiguration,
 } from "@shared/schema";
 import { eq } from "drizzle-orm";
 
@@ -20,11 +19,9 @@ export class DatabaseStorage implements IStorage {
     // Create default if not exists
     const [newConfig] = await db.insert(configurations).values({
       symbol: "btcusdt",
-      buyThreshold: 10,
-      sellThreshold: 10,
-      buyKey: "x",
-      sellKey: "y",
+      coinbaseSymbol: "BTC-USD",
       isActive: true
+      // Other fields will use defaults from schema
     }).returning();
     return newConfig;
   }
