@@ -11,6 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -24,19 +25,41 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Settings, Loader2, Save } from "lucide-react";
+import { Settings, Loader2, Save, Zap, Activity } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface ConfigPanelProps {
   config: Configuration;
 }
 
-// We need to extend the schema for the form because input type="number" returns strings
 const formSchema = insertConfigurationSchema.extend({
-  buyThreshold: z.coerce.number().gt(0),
-  sellThreshold: z.coerce.number().gt(0),
-  coinbaseBuyThreshold: z.coerce.number().gt(0),
-  coinbaseSellThreshold: z.coerce.number().gt(0),
+  binanceBuyWeakMin: z.coerce.number().min(0),
+  binanceBuyWeakMax: z.coerce.number().min(0),
+  binanceBuyMedMin: z.coerce.number().min(0),
+  binanceBuyMedMax: z.coerce.number().min(0),
+  binanceBuyStrongMin: z.coerce.number().min(0),
+  binanceBuyStrongMax: z.coerce.number().min(0),
+  binanceSellWeakMin: z.coerce.number().min(0),
+  binanceSellWeakMax: z.coerce.number().min(0),
+  binanceSellMedMin: z.coerce.number().min(0),
+  binanceSellMedMax: z.coerce.number().min(0),
+  binanceSellStrongMin: z.coerce.number().min(0),
+  binanceSellStrongMax: z.coerce.number().min(0),
+  coinbaseBuyWeakMin: z.coerce.number().min(0),
+  coinbaseBuyWeakMax: z.coerce.number().min(0),
+  coinbaseBuyMedMin: z.coerce.number().min(0),
+  coinbaseBuyMedMax: z.coerce.number().min(0),
+  coinbaseBuyStrongMin: z.coerce.number().min(0),
+  coinbaseBuyStrongMax: z.coerce.number().min(0),
+  coinbaseSellWeakMin: z.coerce.number().min(0),
+  coinbaseSellWeakMax: z.coerce.number().min(0),
+  coinbaseSellMedMin: z.coerce.number().min(0),
+  coinbaseSellMedMax: z.coerce.number().min(0),
+  coinbaseSellStrongMin: z.coerce.number().min(0),
+  coinbaseSellStrongMax: z.coerce.number().min(0),
 });
 
 export function ConfigPanel({ config }: ConfigPanelProps) {
@@ -48,34 +71,51 @@ export function ConfigPanel({ config }: ConfigPanelProps) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       symbol: config.symbol,
-      buyThreshold: config.buyThreshold,
-      sellThreshold: config.sellThreshold,
-      buyKey: config.buyKey,
-      sellKey: config.sellKey,
-      coinbaseSymbol: config.coinbaseSymbol,
-      coinbaseBuyThreshold: config.coinbaseBuyThreshold,
-      coinbaseSellThreshold: config.coinbaseSellThreshold,
-      coinbaseBuyKey: config.coinbaseBuyKey,
-      coinbaseSellKey: config.coinbaseSellKey,
       isActive: config.isActive,
+      binanceBuyWeakMin: config.binanceBuyWeakMin,
+      binanceBuyWeakMax: config.binanceBuyWeakMax,
+      binanceBuyWeakKey: config.binanceBuyWeakKey,
+      binanceBuyMedMin: config.binanceBuyMedMin,
+      binanceBuyMedMax: config.binanceBuyMedMax,
+      binanceBuyMedKey: config.binanceBuyMedKey,
+      binanceBuyStrongMin: config.binanceBuyStrongMin,
+      binanceBuyStrongMax: config.binanceBuyStrongMax,
+      binanceBuyStrongKey: config.binanceBuyStrongKey,
+      binanceSellWeakMin: config.binanceSellWeakMin,
+      binanceSellWeakMax: config.binanceSellWeakMax,
+      binanceSellWeakKey: config.binanceSellWeakKey,
+      binanceSellMedMin: config.binanceSellMedMin,
+      binanceSellMedMax: config.binanceSellMedMax,
+      binanceSellMedKey: config.binanceSellMedKey,
+      binanceSellStrongMin: config.binanceSellStrongMin,
+      binanceSellStrongMax: config.binanceSellStrongMax,
+      binanceSellStrongKey: config.binanceSellStrongKey,
+      coinbaseSymbol: config.coinbaseSymbol,
+      coinbaseBuyWeakMin: config.coinbaseBuyWeakMin,
+      coinbaseBuyWeakMax: config.coinbaseBuyWeakMax,
+      coinbaseBuyWeakKey: config.coinbaseBuyWeakKey,
+      coinbaseBuyMedMin: config.coinbaseBuyMedMin,
+      coinbaseBuyMedMax: config.coinbaseBuyMedMax,
+      coinbaseBuyMedKey: config.coinbaseBuyMedKey,
+      coinbaseBuyStrongMin: config.coinbaseBuyStrongMin,
+      coinbaseBuyStrongMax: config.coinbaseBuyStrongMax,
+      coinbaseBuyStrongKey: config.coinbaseBuyStrongKey,
+      coinbaseSellWeakMin: config.coinbaseSellWeakMin,
+      coinbaseSellWeakMax: config.coinbaseSellWeakMax,
+      coinbaseSellWeakKey: config.coinbaseSellWeakKey,
+      coinbaseSellMedMin: config.coinbaseSellMedMin,
+      coinbaseSellMedMax: config.coinbaseSellMedMax,
+      coinbaseSellMedKey: config.coinbaseSellMedKey,
+      coinbaseSellStrongMin: config.coinbaseSellStrongMin,
+      coinbaseSellStrongMax: config.coinbaseSellStrongMax,
+      coinbaseSellStrongKey: config.coinbaseSellStrongKey,
     },
   });
 
-  // Reset form when config changes from server
   useEffect(() => {
-    form.reset({
-      symbol: config.symbol,
-      buyThreshold: config.buyThreshold,
-      sellThreshold: config.sellThreshold,
-      buyKey: config.buyKey,
-      sellKey: config.sellKey,
-      coinbaseSymbol: config.coinbaseSymbol,
-      coinbaseBuyThreshold: config.coinbaseBuyThreshold,
-      coinbaseSellThreshold: config.coinbaseSellThreshold,
-      coinbaseBuyKey: config.coinbaseBuyKey,
-      coinbaseSellKey: config.coinbaseSellKey,
-      isActive: config.isActive,
-    });
+    if (config) {
+      form.reset(config);
+    }
   }, [config, form]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -95,6 +135,61 @@ export function ConfigPanel({ config }: ConfigPanelProps) {
     }
   }
 
+  const renderRangeFields = (prefix: string, label: string) => {
+    const levels = [
+      { id: "Weak", name: "Weak", color: "text-blue-400" },
+      { id: "Med", name: "Medium", color: "text-yellow-400" },
+      { id: "Strong", name: "Strong", color: "text-red-400" },
+    ];
+
+    return (
+      <div className="space-y-4">
+        <h4 className="text-sm font-semibold">{label}</h4>
+        {levels.map((level) => (
+          <div key={level.id} className="grid grid-cols-4 gap-2 items-end p-3 rounded-lg bg-secondary/20 border border-white/5">
+            <div className={`text-xs font-bold ${level.color}`}>{level.name}</div>
+            <FormField
+              control={form.control}
+              name={`${prefix}${level.id}Min` as any}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-[10px] uppercase">Min</FormLabel>
+                  <FormControl>
+                    <Input type="number" step="0.00000001" {...field} className="h-8 text-xs px-2" />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name={`${prefix}${level.id}Max` as any}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-[10px] uppercase">Max</FormLabel>
+                  <FormControl>
+                    <Input type="number" step="0.00000001" {...field} className="h-8 text-xs px-2" />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name={`${prefix}${level.id}Key` as any}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-[10px] uppercase">Key</FormLabel>
+                  <FormControl>
+                    <Input {...field} maxLength={1} className="h-8 text-xs px-2 text-center font-mono uppercase" />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -103,198 +198,93 @@ export function ConfigPanel({ config }: ConfigPanelProps) {
           Settings
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px] bg-card border-border">
-        <DialogHeader>
-          <DialogTitle className="text-xl font-display">Controller Configuration</DialogTitle>
+      <DialogContent className="sm:max-w-[600px] h-[90vh] flex flex-col p-0">
+        <DialogHeader className="p-6 pb-0">
+          <DialogTitle className="text-xl font-display flex items-center gap-2">
+            <Activity className="w-5 h-5 text-primary" />
+            Street Fighter II Controller
+          </DialogTitle>
           <DialogDescription>
-            Adjust the thresholds and key mappings for the MAME controller triggers.
+            Configure quantity ranges for Weak, Medium, and Strong attacks.
           </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 pt-4">
-            
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="symbol"
-                render={({ field }) => (
-                  <FormItem className="col-span-2">
-                    <FormLabel>Trading Pair (Binance)</FormLabel>
-                    <FormControl>
-                      <Input placeholder="btcusdt" {...field} className="font-mono uppercase" />
-                    </FormControl>
-                    <FormDescription>The symbol to monitor (e.g., btcusdt, ethusdt).</FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+          <form onSubmit={form.handleSubmit(onSubmit)} className="flex-1 flex flex-col min-h-0">
+            <ScrollArea className="flex-1 p-6">
+              <div className="space-y-8">
+                <div className="flex items-center justify-between p-4 rounded-lg bg-primary/5 border border-primary/20">
+                  <div className="space-y-0.5">
+                    <FormLabel className="text-base font-semibold">Master Toggle</FormLabel>
+                    <FormDescription>Enable or disable HID simulation</FormDescription>
+                  </div>
+                  <FormField
+                    control={form.control}
+                    name="isActive"
+                    render={({ field }) => (
+                      <FormControl>
+                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                      </FormControl>
+                    )}
+                  />
+                </div>
 
-              <div className="col-span-2 grid grid-cols-2 gap-4 p-4 rounded-xl bg-secondary/30 border border-white/5">
-                <FormField
-                  control={form.control}
-                  name="buyThreshold"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-[hsl(var(--color-buy))]">Buy Threshold</FormLabel>
-                      <FormControl>
-                        <Input type="number" step="0.00000001" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="buyKey"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Buy Key</FormLabel>
-                      <FormControl>
-                        <Input {...field} maxLength={1} className="font-mono text-center uppercase" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div className="col-span-2 grid grid-cols-2 gap-4 p-4 rounded-xl bg-secondary/30 border border-white/5">
-                <FormField
-                  control={form.control}
-                  name="sellThreshold"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-[hsl(var(--color-sell))]">Sell Threshold</FormLabel>
-                      <FormControl>
-                        <Input type="number" step="0.00000001" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="sellKey"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Sell Key</FormLabel>
-                      <FormControl>
-                        <Input {...field} maxLength={1} className="font-mono text-center uppercase" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div className="col-span-2 border-t border-white/10 pt-4">
-                <h4 className="text-sm font-semibold mb-4">Coinbase Configuration</h4>
-              </div>
-
-              <FormField
-                control={form.control}
-                name="coinbaseSymbol"
-                render={({ field }) => (
-                  <FormItem className="col-span-2">
-                    <FormLabel>Trading Pair (Coinbase)</FormLabel>
-                    <FormControl>
-                      <Input placeholder="BTC-USD" {...field} className="font-mono uppercase" />
-                    </FormControl>
-                    <FormDescription>The product ID to monitor (e.g., BTC-USD, ETH-USD).</FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="col-span-2 grid grid-cols-2 gap-4 p-4 rounded-xl bg-secondary/30 border border-white/5">
-                <FormField
-                  control={form.control}
-                  name="coinbaseBuyThreshold"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-[hsl(var(--color-buy))]">Buy Threshold</FormLabel>
-                      <FormControl>
-                        <Input type="number" step="0.00000001" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="coinbaseBuyKey"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Buy Key</FormLabel>
-                      <FormControl>
-                        <Input {...field} maxLength={1} className="font-mono text-center uppercase" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div className="col-span-2 grid grid-cols-2 gap-4 p-4 rounded-xl bg-secondary/30 border border-white/5">
-                <FormField
-                  control={form.control}
-                  name="coinbaseSellThreshold"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-[hsl(var(--color-sell))]">Sell Threshold</FormLabel>
-                      <FormControl>
-                        <Input type="number" step="0.00000001" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="coinbaseSellKey"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Sell Key</FormLabel>
-                      <FormControl>
-                        <Input {...field} maxLength={1} className="font-mono text-center uppercase" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <FormField
-                control={form.control}
-                name="isActive"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border border-white/5 p-4 bg-secondary/30 col-span-2">
-                    <div className="space-y-0.5">
-                      <FormLabel className="text-base">System Active</FormLabel>
-                      <FormDescription>
-                        Toggle monitoring on/off
-                      </FormDescription>
+                <Tabs defaultValue="binance" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="binance">Binance (P1)</TabsTrigger>
+                    <TabsTrigger value="coinbase">Coinbase (P2)</TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="binance" className="space-y-6 pt-4">
+                    <FormField
+                      control={form.control}
+                      name="symbol"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>P1 Trading Pair</FormLabel>
+                          <FormControl>
+                            <Input {...field} className="font-mono uppercase" placeholder="btcusdt" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {renderRangeFields("binanceBuy", "P1 Punches (Buy Signal)")}
+                      {renderRangeFields("binanceSell", "P1 Kicks (Sell Signal)")}
                     </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-            </div>
+                  </TabsContent>
 
-            <div className="flex justify-end gap-3">
+                  <TabsContent value="coinbase" className="space-y-6 pt-4">
+                    <FormField
+                      control={form.control}
+                      name="coinbaseSymbol"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>P2 Trading Pair</FormLabel>
+                          <FormControl>
+                            <Input {...field} className="font-mono uppercase" placeholder="BTC-USD" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {renderRangeFields("coinbaseBuy", "P2 Punches (Buy Signal)")}
+                      {renderRangeFields("coinbaseSell", "P2 Kicks (Sell Signal)")}
+                    </div>
+                  </TabsContent>
+                </Tabs>
+              </div>
+            </ScrollArea>
+            
+            <DialogFooter className="p-6 bg-secondary/10 border-t">
               <Button type="button" variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
-              <Button type="submit" disabled={updateConfig.isPending} className="bg-primary text-primary-foreground hover:bg-primary/90">
-                {updateConfig.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                {!updateConfig.isPending && <Save className="w-4 h-4 mr-2" />}
-                Save Changes
+              <Button type="submit" disabled={updateConfig.isPending}>
+                {updateConfig.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+                Save Configuration
               </Button>
-            </div>
+            </DialogFooter>
           </form>
         </Form>
       </DialogContent>
