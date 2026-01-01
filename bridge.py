@@ -97,7 +97,7 @@ class CryptoMAMEBridge:
     def connect_binance(self):
         from websocket import WebSocketApp
         symbol = self.config['symbol'].lower()
-        ws_url = f"wss://stream.binance.com:9443/ws/{symbol}@aggTrade"
+        ws_url = f"wss://stream.binance.us:9443/ws/{symbol}@aggTrade"
         ws = WebSocketApp(ws_url, on_message=self.on_binance_message)
         ws.run_forever(reconnect=5)
 

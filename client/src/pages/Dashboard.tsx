@@ -21,18 +21,6 @@ export default function Dashboard() {
     config?.isActive
   );
 
-  // Binance thresholds and active states
-  const buyThresholdNum = config?.buyThreshold ? Number(config.buyThreshold) : Infinity;
-  const sellThresholdNum = config?.sellThreshold ? Number(config.sellThreshold) : Infinity;
-  const isBinanceBuyActive = config?.isActive && binanceData.buyQuantity >= buyThresholdNum;
-  const isBinanceSellActive = config?.isActive && binanceData.sellQuantity >= sellThresholdNum;
-
-  // Coinbase thresholds and active states
-  const coinbaseBuyThresholdNum = config?.coinbaseBuyThreshold ? Number(config.coinbaseBuyThreshold) : Infinity;
-  const coinbaseSellThresholdNum = config?.coinbaseSellThreshold ? Number(config.coinbaseSellThreshold) : Infinity;
-  const isCoinbaseBuyActive = config?.isActive && coinbaseData.buyQuantity >= coinbaseBuyThresholdNum;
-  const isCoinbaseSellActive = config?.isActive && coinbaseData.sellQuantity >= coinbaseSellThresholdNum;
-
   if (configLoading) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center space-y-4">
@@ -54,169 +42,155 @@ export default function Dashboard() {
     );
   }
 
+  const checkActive = (val: number, min: string | number, max: string | number) => {
+    return config.isActive && val >= Number(min) && val <= Number(max);
+  };
+
+  const renderPlayerControls = (
+    player: string,
+    data: any,
+    prefix: "binanceBuy" | "binanceSell" | "coinbaseBuy" | "coinbaseSell"
+  ) => {
+    const isP1 = player === "P1";
+    const type = prefix.toLowerCase().includes("buy") ? "buy" : "sell";
+    const label = type === "buy" ? "Punches" : "Kicks";
+    
+    return (
+      <div className="space-y-3">
+        <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
+          {player} {label}
+        </div>
+        <div className="grid grid-cols-3 gap-2">
+          <KeyIndicator 
+            label={config[`${prefix}WeakKey` as keyof typeof config] as string}
+            active={checkActive(data[`${type}Quantity`], config[`${prefix}WeakMin`], config[`${prefix}WeakMax`])}
+            type={type}
+            min={Number(config[`${prefix}WeakMin`])}
+            max={Number(config[`${prefix}WeakMax`])}
+            currentValue={data[`${type}Quantity`]}
+          />
+          <KeyIndicator 
+            label={config[`${prefix}MedKey` as keyof typeof config] as string}
+            active={checkActive(data[`${type}Quantity`], config[`${prefix}MedMin`], config[`${prefix}MedMax`])}
+            type={type}
+            min={Number(config[`${prefix}MedMin`])}
+            max={Number(config[`${prefix}MedMax`])}
+            currentValue={data[`${type}Quantity`]}
+          />
+          <KeyIndicator 
+            label={config[`${prefix}StrongKey` as keyof typeof config] as string}
+            active={checkActive(data[`${type}Quantity`], config[`${prefix}StrongMin`], config[`${prefix}StrongMax`])}
+            type={type}
+            min={Number(config[`${prefix}StrongMin`])}
+            max={Number(config[`${prefix}StrongMax`])}
+            currentValue={data[`${type}Quantity`]}
+          />
+        </div>
+      </div>
+    );
+  };
+
   return (
-    <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary/30 p-4 md:p-8 flex flex-col gap-6">
-      
-      {/* Header Bar */}
+    <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary/30 p-4 md:p-6 flex flex-col gap-4">
       <header className="flex flex-col md:flex-row items-center justify-between gap-4 bg-card/30 backdrop-blur-md border border-white/5 p-4 rounded-2xl">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-purple-800 flex items-center justify-center shadow-lg shadow-primary/20">
-            <Cpu className="text-white w-6 h-6" />
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-purple-800 flex items-center justify-center shadow-lg shadow-primary/20">
+            <Cpu className="text-white w-5 h-5" />
           </div>
           <div>
-            <h1 className="text-xl font-display font-bold tracking-tight">MAME Controller</h1>
-            <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground">
-              <span className="uppercase">{config.symbol}</span>
+            <h1 className="text-lg font-display font-bold tracking-tight">SF2 Crypto Bridge</h1>
+            <div className="flex items-center gap-2 text-[10px] font-mono text-muted-foreground">
+              <span className="uppercase">P1: {config.symbol}</span>
               <span className="w-1 h-1 rounded-full bg-white/20" />
-              <span>{binanceData.lastPrice > 0 ? `$${binanceData.lastPrice.toLocaleString()}` : '---'}</span>
+              <span className="uppercase">P2: {config.coinbaseSymbol}</span>
             </div>
           </div>
         </div>
 
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/20 border border-white/5">
+          <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-black/20 border border-white/5">
             <Wifi className={cn(
-              "w-3 h-3 transition-colors", 
+              "w-2 h-2 transition-colors", 
               binanceStatus === 'connected' && coinbaseStatus === 'connected' ? "text-green-500" : "text-red-500"
             )} />
-            <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              Binance: {binanceStatus} | Coinbase: {coinbaseStatus}
+            <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+              B: {binanceStatus} | C: {coinbaseStatus}
             </span>
           </div>
           <ConfigPanel config={config} />
         </div>
       </header>
 
-      {/* Main Grid */}
-      <main className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        
-        {/* Left Col: Status & Chart */}
-        <div className="lg:col-span-1 space-y-6 flex flex-col">
-          {/* Status Card */}
-          <div className="bg-card rounded-3xl p-6 border border-white/5 space-y-4 shadow-xl">
+      <main className="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-4">
+        <div className="lg:col-span-1 space-y-4 flex flex-col">
+          <div className="bg-card rounded-2xl p-4 border border-white/5 space-y-4 shadow-xl">
             <div className="flex items-center justify-between">
-              <h3 className="font-medium text-muted-foreground flex items-center gap-2">
-                <Activity className="w-4 h-4" />
-                Stream Activity
+              <h3 className="text-xs font-medium text-muted-foreground flex items-center gap-2">
+                <Activity className="w-3 h-3" />
+                Live Streams
               </h3>
-              <Badge variant={config.isActive ? "default" : "secondary"} className="uppercase text-[10px]">
+              <Badge variant={config.isActive ? "default" : "secondary"} className="uppercase text-[8px]">
                 {config.isActive ? "Active" : "Paused"}
               </Badge>
             </div>
             
             <div className="space-y-4">
-              <div>
-                <h4 className="text-xs font-semibold text-muted-foreground mb-2">Binance {config.symbol.toUpperCase()}</h4>
-                <div className="h-[100px] w-full bg-black/20 rounded-xl overflow-hidden border border-white/5 relative">
+              <div className="space-y-1">
+                <div className="flex justify-between text-[10px] uppercase font-bold text-muted-foreground/60">
+                  <span>Binance {config.symbol}</span>
+                  <span>${binanceData.lastPrice.toLocaleString()}</span>
+                </div>
+                <div className="h-20 w-full bg-black/20 rounded-lg overflow-hidden border border-white/5">
                   <VolumeChart 
                     currentData={binanceData} 
                     buyColor="hsl(var(--color-buy))"
                     sellColor="hsl(var(--color-sell))"
                   />
-                  <div className="absolute top-1 right-1 text-[9px] font-mono text-white/30">500ms</div>
-                </div>
-                <div className="grid grid-cols-2 gap-2 pt-2">
-                  <div className="p-2 rounded-lg bg-black/20 border border-white/5">
-                    <p className="text-xs text-muted-foreground mb-0.5">Buy Qty</p>
-                    <p className="font-mono text-sm text-[hsl(var(--color-buy))]">
-                      {binanceData.buyQuantity.toFixed(8)}
-                    </p>
-                  </div>
-                  <div className="p-2 rounded-lg bg-black/20 border border-white/5">
-                    <p className="text-xs text-muted-foreground mb-0.5">Sell Qty</p>
-                    <p className="font-mono text-sm text-[hsl(var(--color-sell))]">
-                      {binanceData.sellQuantity.toFixed(8)}
-                    </p>
-                  </div>
                 </div>
               </div>
 
-              <div>
-                <h4 className="text-xs font-semibold text-muted-foreground mb-2">Coinbase {config.coinbaseSymbol}</h4>
-                <div className="h-[100px] w-full bg-black/20 rounded-xl overflow-hidden border border-white/5 relative">
+              <div className="space-y-1">
+                <div className="flex justify-between text-[10px] uppercase font-bold text-muted-foreground/60">
+                  <span>Coinbase {config.coinbaseSymbol}</span>
+                </div>
+                <div className="h-20 w-full bg-black/20 rounded-lg overflow-hidden border border-white/5">
                   <VolumeChart 
                     currentData={coinbaseData} 
                     buyColor="hsl(var(--color-buy))"
                     sellColor="hsl(var(--color-sell))"
                   />
-                  <div className="absolute top-1 right-1 text-[9px] font-mono text-white/30">500ms</div>
-                </div>
-                <div className="grid grid-cols-2 gap-2 pt-2">
-                  <div className="p-2 rounded-lg bg-black/20 border border-white/5">
-                    <p className="text-xs text-muted-foreground mb-0.5">Buy Qty</p>
-                    <p className="font-mono text-sm text-[hsl(var(--color-buy))]">
-                      {coinbaseData.buyQuantity.toFixed(8)}
-                    </p>
-                  </div>
-                  <div className="p-2 rounded-lg bg-black/20 border border-white/5">
-                    <p className="text-xs text-muted-foreground mb-0.5">Sell Qty</p>
-                    <p className="font-mono text-sm text-[hsl(var(--color-sell))]">
-                      {coinbaseData.sellQuantity.toFixed(8)}
-                    </p>
-                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Warning Card */}
-          <div className="bg-orange-500/5 border border-orange-500/20 rounded-3xl p-6 flex-1">
+          <div className="bg-orange-500/5 border border-orange-500/20 rounded-2xl p-4">
              <div className="flex gap-3">
-               <Terminal className="w-5 h-5 text-orange-500 shrink-0 mt-1" />
-               <div className="space-y-2">
-                 <h4 className="font-bold text-orange-500">Desktop Bridge Required</h4>
-                 <p className="text-sm text-orange-200/70 leading-relaxed">
-                   This dashboard visualizes triggers only. Browsers cannot simulate global key presses for MAME.
+               <Terminal className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
+               <div className="space-y-1">
+                 <h4 className="text-xs font-bold text-orange-500 uppercase">Bridge Active</h4>
+                 <p className="text-[10px] text-orange-200/50 leading-tight">
+                   The Python bridge is receiving these triggers via WebSocket.
                  </p>
-                 <p className="text-sm text-orange-200/70 leading-relaxed">
-                   Run the Python companion script to forward these events to your OS.
-                 </p>
-                 <code className="block mt-3 p-3 bg-black/30 rounded-lg text-xs font-mono text-orange-300 break-all">
-                   python bridge.py --endpoint ws://localhost:5000/api/stream
-                 </code>
                </div>
              </div>
           </div>
         </div>
 
-        {/* Right Col: Big Indicators */}
-        <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-4">
-            <div className="text-xs font-semibold text-muted-foreground">Binance Triggers</div>
-            <div className="grid grid-cols-1 gap-4">
-              <KeyIndicator 
-                label={config.buyKey} 
-                active={isBinanceBuyActive} 
-                type="buy"
-                threshold={buyThresholdNum}
-                currentValue={binanceData.buyQuantity}
-              />
-              <KeyIndicator 
-                label={config.sellKey} 
-                active={isBinanceSellActive} 
-                type="sell"
-                threshold={sellThresholdNum}
-                currentValue={binanceData.sellQuantity}
-              />
+        <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-4 p-4 rounded-2xl bg-card/20 border border-white/5">
+            <div className="text-xs font-bold uppercase tracking-widest text-primary/80">Player 1 (Binance)</div>
+            <div className="space-y-6">
+              {renderPlayerControls("P1", binanceData, "binanceBuy")}
+              {renderPlayerControls("P1", binanceData, "binanceSell")}
             </div>
           </div>
-          <div className="space-y-4">
-            <div className="text-xs font-semibold text-muted-foreground">Coinbase Triggers</div>
-            <div className="grid grid-cols-1 gap-4">
-              <KeyIndicator 
-                label={config.coinbaseBuyKey} 
-                active={isCoinbaseBuyActive} 
-                type="buy"
-                threshold={coinbaseBuyThresholdNum}
-                currentValue={coinbaseData.buyQuantity}
-              />
-              <KeyIndicator 
-                label={config.coinbaseSellKey} 
-                active={isCoinbaseSellActive} 
-                type="sell"
-                threshold={coinbaseSellThresholdNum}
-                currentValue={coinbaseData.sellQuantity}
-              />
+          
+          <div className="space-y-4 p-4 rounded-2xl bg-card/20 border border-white/5">
+            <div className="text-xs font-bold uppercase tracking-widest text-purple-400">Player 2 (Coinbase)</div>
+            <div className="space-y-6">
+              {renderPlayerControls("P2", coinbaseData, "coinbaseBuy")}
+              {renderPlayerControls("P2", coinbaseData, "coinbaseSell")}
             </div>
           </div>
         </div>
@@ -227,9 +201,9 @@ export default function Dashboard() {
 
 function Loader() {
   return (
-    <div className="relative w-16 h-16">
-      <div className="absolute inset-0 border-4 border-primary/20 rounded-full"></div>
-      <div className="absolute inset-0 border-4 border-t-primary rounded-full animate-spin"></div>
+    <div className="relative w-12 h-12">
+      <div className="absolute inset-0 border-2 border-primary/20 rounded-full"></div>
+      <div className="absolute inset-0 border-2 border-t-primary rounded-full animate-spin"></div>
     </div>
   );
 }

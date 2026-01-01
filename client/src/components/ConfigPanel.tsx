@@ -25,10 +25,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Settings, Loader2, Save, Zap, Activity } from "lucide-react";
+import { Settings, Loader2, Save, Activity } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface ConfigPanelProps {
@@ -62,65 +61,93 @@ const formSchema = insertConfigurationSchema.extend({
   coinbaseSellStrongMax: z.coerce.number().min(0),
 });
 
+type FormValues = z.infer<typeof formSchema>;
+
 export function ConfigPanel({ config }: ConfigPanelProps) {
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
   const updateConfig = useUpdateConfiguration();
   
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       symbol: config.symbol,
       isActive: config.isActive,
-      binanceBuyWeakMin: config.binanceBuyWeakMin,
-      binanceBuyWeakMax: config.binanceBuyWeakMax,
+      binanceBuyWeakMin: Number(config.binanceBuyWeakMin),
+      binanceBuyWeakMax: Number(config.binanceBuyWeakMax),
       binanceBuyWeakKey: config.binanceBuyWeakKey,
-      binanceBuyMedMin: config.binanceBuyMedMin,
-      binanceBuyMedMax: config.binanceBuyMedMax,
+      binanceBuyMedMin: Number(config.binanceBuyMedMin),
+      binanceBuyMedMax: Number(config.binanceBuyMedMax),
       binanceBuyMedKey: config.binanceBuyMedKey,
-      binanceBuyStrongMin: config.binanceBuyStrongMin,
-      binanceBuyStrongMax: config.binanceBuyStrongMax,
+      binanceBuyStrongMin: Number(config.binanceBuyStrongMin),
+      binanceBuyStrongMax: Number(config.binanceBuyStrongMax),
       binanceBuyStrongKey: config.binanceBuyStrongKey,
-      binanceSellWeakMin: config.binanceSellWeakMin,
-      binanceSellWeakMax: config.binanceSellWeakMax,
+      binanceSellWeakMin: Number(config.binanceSellWeakMin),
+      binanceSellWeakMax: Number(config.binanceSellWeakMax),
       binanceSellWeakKey: config.binanceSellWeakKey,
-      binanceSellMedMin: config.binanceSellMedMin,
-      binanceSellMedMax: config.binanceSellMedMax,
+      binanceSellMedMin: Number(config.binanceSellMedMin),
+      binanceSellMedMax: Number(config.binanceSellMedMax),
       binanceSellMedKey: config.binanceSellMedKey,
-      binanceSellStrongMin: config.binanceSellStrongMin,
-      binanceSellStrongMax: config.binanceSellStrongMax,
+      binanceSellStrongMin: Number(config.binanceSellStrongMin),
+      binanceSellStrongMax: Number(config.binanceSellStrongMax),
       binanceSellStrongKey: config.binanceSellStrongKey,
       coinbaseSymbol: config.coinbaseSymbol,
-      coinbaseBuyWeakMin: config.coinbaseBuyWeakMin,
-      coinbaseBuyWeakMax: config.coinbaseBuyWeakMax,
+      coinbaseBuyWeakMin: Number(config.coinbaseBuyWeakMin),
+      coinbaseBuyWeakMax: Number(config.coinbaseBuyWeakMax),
       coinbaseBuyWeakKey: config.coinbaseBuyWeakKey,
-      coinbaseBuyMedMin: config.coinbaseBuyMedMin,
-      coinbaseBuyMedMax: config.coinbaseBuyMedMax,
+      coinbaseBuyMedMin: Number(config.coinbaseBuyMedMin),
+      coinbaseBuyMedMax: Number(config.coinbaseBuyMedMax),
       coinbaseBuyMedKey: config.coinbaseBuyMedKey,
-      coinbaseBuyStrongMin: config.coinbaseBuyStrongMin,
-      coinbaseBuyStrongMax: config.coinbaseBuyStrongMax,
+      coinbaseBuyStrongMin: Number(config.coinbaseBuyStrongMin),
+      coinbaseBuyStrongMax: Number(config.coinbaseBuyStrongMax),
       coinbaseBuyStrongKey: config.coinbaseBuyStrongKey,
-      coinbaseSellWeakMin: config.coinbaseSellWeakMin,
-      coinbaseSellWeakMax: config.coinbaseSellWeakMax,
+      coinbaseSellWeakMin: Number(config.coinbaseSellWeakMin),
+      coinbaseSellWeakMax: Number(config.coinbaseSellWeakMax),
       coinbaseSellWeakKey: config.coinbaseSellWeakKey,
-      coinbaseSellMedMin: config.coinbaseSellMedMin,
-      coinbaseSellMedMax: config.coinbaseSellMedMax,
+      coinbaseSellMedMin: Number(config.coinbaseSellMedMin),
+      coinbaseSellMedMax: Number(config.coinbaseSellMedMax),
       coinbaseSellMedKey: config.coinbaseSellMedKey,
-      coinbaseSellStrongMin: config.coinbaseSellStrongMin,
-      coinbaseSellStrongMax: config.coinbaseSellStrongMax,
+      coinbaseSellStrongMin: Number(config.coinbaseSellStrongMin),
+      coinbaseSellStrongMax: Number(config.coinbaseSellStrongMax),
       coinbaseSellStrongKey: config.coinbaseSellStrongKey,
     },
   });
 
   useEffect(() => {
     if (config) {
-      form.reset(config);
+      form.reset({
+        ...config,
+        binanceBuyWeakMin: Number(config.binanceBuyWeakMin),
+        binanceBuyWeakMax: Number(config.binanceBuyWeakMax),
+        binanceBuyMedMin: Number(config.binanceBuyMedMin),
+        binanceBuyMedMax: Number(config.binanceBuyMedMax),
+        binanceBuyStrongMin: Number(config.binanceBuyStrongMin),
+        binanceBuyStrongMax: Number(config.binanceBuyStrongMax),
+        binanceSellWeakMin: Number(config.binanceSellWeakMin),
+        binanceSellWeakMax: Number(config.binanceSellWeakMax),
+        binanceSellMedMin: Number(config.binanceSellMedMin),
+        binanceSellMedMax: Number(config.binanceSellMedMax),
+        binanceSellStrongMin: Number(config.binanceSellStrongMin),
+        binanceSellStrongMax: Number(config.binanceSellStrongMax),
+        coinbaseBuyWeakMin: Number(config.coinbaseBuyWeakMin),
+        coinbaseBuyWeakMax: Number(config.coinbaseBuyWeakMax),
+        coinbaseBuyMedMin: Number(config.coinbaseBuyMedMin),
+        coinbaseBuyMedMax: Number(config.coinbaseBuyMedMax),
+        coinbaseBuyStrongMin: Number(config.coinbaseBuyStrongMin),
+        coinbaseBuyStrongMax: Number(config.coinbaseBuyStrongMax),
+        coinbaseSellWeakMin: Number(config.coinbaseSellWeakMin),
+        coinbaseSellWeakMax: Number(config.coinbaseSellWeakMax),
+        coinbaseSellMedMin: Number(config.coinbaseSellMedMin),
+        coinbaseSellMedMax: Number(config.coinbaseSellMedMax),
+        coinbaseSellStrongMin: Number(config.coinbaseSellStrongMin),
+        coinbaseSellStrongMax: Number(config.coinbaseSellStrongMax),
+      } as any);
     }
   }, [config, form]);
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: FormValues) {
     try {
-      await updateConfig.mutateAsync(values);
+      await updateConfig.mutateAsync(values as any);
       toast({
         title: "Configuration updated",
         description: "Your settings have been saved and applied immediately.",
@@ -144,18 +171,18 @@ export function ConfigPanel({ config }: ConfigPanelProps) {
 
     return (
       <div className="space-y-4">
-        <h4 className="text-sm font-semibold">{label}</h4>
+        <h4 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground/70">{label}</h4>
         {levels.map((level) => (
-          <div key={level.id} className="grid grid-cols-4 gap-2 items-end p-3 rounded-lg bg-secondary/20 border border-white/5">
-            <div className={`text-xs font-bold ${level.color}`}>{level.name}</div>
+          <div key={level.id} className="grid grid-cols-12 gap-2 items-end p-3 rounded-lg bg-secondary/20 border border-white/5">
+            <div className={`col-span-2 text-[10px] font-bold uppercase ${level.color}`}>{level.name}</div>
             <FormField
               control={form.control}
               name={`${prefix}${level.id}Min` as any}
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-[10px] uppercase">Min</FormLabel>
+                <FormItem className="col-span-4">
+                  <FormLabel className="text-[9px] uppercase font-bold text-muted-foreground/50">Min Qty</FormLabel>
                   <FormControl>
-                    <Input type="number" step="0.00000001" {...field} className="h-8 text-xs px-2" />
+                    <Input type="number" step="0.00000001" {...field} className="h-8 text-[11px] font-mono px-2 bg-black/20" />
                   </FormControl>
                 </FormItem>
               )}
@@ -164,10 +191,10 @@ export function ConfigPanel({ config }: ConfigPanelProps) {
               control={form.control}
               name={`${prefix}${level.id}Max` as any}
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-[10px] uppercase">Max</FormLabel>
+                <FormItem className="col-span-4">
+                  <FormLabel className="text-[9px] uppercase font-bold text-muted-foreground/50">Max Qty</FormLabel>
                   <FormControl>
-                    <Input type="number" step="0.00000001" {...field} className="h-8 text-xs px-2" />
+                    <Input type="number" step="0.00000001" {...field} className="h-8 text-[11px] font-mono px-2 bg-black/20" />
                   </FormControl>
                 </FormItem>
               )}
@@ -176,10 +203,10 @@ export function ConfigPanel({ config }: ConfigPanelProps) {
               control={form.control}
               name={`${prefix}${level.id}Key` as any}
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-[10px] uppercase">Key</FormLabel>
+                <FormItem className="col-span-2">
+                  <FormLabel className="text-[9px] uppercase font-bold text-muted-foreground/50">Key</FormLabel>
                   <FormControl>
-                    <Input {...field} maxLength={1} className="h-8 text-xs px-2 text-center font-mono uppercase" />
+                    <Input {...field} maxLength={1} className="h-8 text-[11px] px-0 text-center font-mono uppercase bg-primary/10 border-primary/30" />
                   </FormControl>
                 </FormItem>
               )}
@@ -198,14 +225,14 @@ export function ConfigPanel({ config }: ConfigPanelProps) {
           Settings
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px] h-[90vh] flex flex-col p-0">
-        <DialogHeader className="p-6 pb-0">
+      <DialogContent className="sm:max-w-[800px] h-[90vh] flex flex-col p-0 bg-card border-border/40 shadow-2xl">
+        <DialogHeader className="p-6 pb-4 bg-secondary/5 border-b">
           <DialogTitle className="text-xl font-display flex items-center gap-2">
             <Activity className="w-5 h-5 text-primary" />
-            Street Fighter II Controller
+            Street Fighter II Controller Configuration
           </DialogTitle>
           <DialogDescription>
-            Configure quantity ranges for Weak, Medium, and Strong attacks.
+            Map crypto trade quantities to arcade buttons. Set 8-decimal ranges for Weak, Medium, and Strong attacks.
           </DialogDescription>
         </DialogHeader>
 

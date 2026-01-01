@@ -5,21 +5,25 @@ interface KeyIndicatorProps {
   label: string;
   active: boolean;
   type: "buy" | "sell";
-  threshold: number;
+  min: number;
+  max: number;
   currentValue: number;
 }
 
-export function KeyIndicator({ label, active, type, threshold, currentValue }: KeyIndicatorProps) {
+export function KeyIndicator({ label, active, type, min, max, currentValue }: KeyIndicatorProps) {
   const isBuy = type === "buy";
-  const percentage = Math.min((currentValue / threshold) * 100, 100);
+  
+  // Calculate percentage within the specific range
+  const range = max - min;
+  const progressInRange = Math.max(0, currentValue - min);
+  const percentage = range > 0 ? Math.min((progressInRange / range) * 100, 100) : (currentValue >= min ? 100 : 0);
   
   return (
     <div className={cn(
-      "relative flex flex-col items-center justify-center p-8 rounded-3xl border border-border/50 bg-card/50 backdrop-blur-sm overflow-hidden transition-all duration-300",
-      active && isBuy && "border-[hsl(var(--color-buy))] shadow-[0_0_50px_-12px_hsl(var(--color-buy)/0.5)]",
-      active && !isBuy && "border-[hsl(var(--color-sell))] shadow-[0_0_50px_-12px_hsl(var(--color-sell)/0.5)]"
+      "relative flex flex-col items-center justify-center p-4 rounded-2xl border border-border/50 bg-card/50 backdrop-blur-sm overflow-hidden transition-all duration-300",
+      active && isBuy && "border-[hsl(var(--color-buy))] shadow-[0_0_30px_-12px_hsl(var(--color-buy)/0.5)]",
+      active && !isBuy && "border-[hsl(var(--color-sell))] shadow-[0_0_30px_-12px_hsl(var(--color-sell)/0.5)]"
     )}>
-      {/* Background Fill Animation based on volume intensity */}
       <div 
         className={cn(
           "absolute bottom-0 left-0 right-0 opacity-10 transition-all duration-200 ease-linear",
@@ -28,21 +32,17 @@ export function KeyIndicator({ label, active, type, threshold, currentValue }: K
         style={{ height: `${percentage}%` }}
       />
 
-      <div className="relative z-10 text-center space-y-4">
-        <h3 className="text-muted-foreground uppercase tracking-widest text-sm font-semibold">
-          {isBuy ? "Buy Signal" : "Sell Signal"}
-        </h3>
-        
-        <div className="relative">
+      <div className="relative z-10 text-center space-y-2 w-full">
+        <div className="relative h-20 flex items-center justify-center">
           <motion.div
             animate={{
               scale: active ? 1.1 : 1,
               textShadow: active 
-                ? `0 0 30px ${isBuy ? 'hsl(var(--color-buy))' : 'hsl(var(--color-sell))'}` 
+                ? `0 0 20px ${isBuy ? 'hsl(var(--color-buy))' : 'hsl(var(--color-sell))'}` 
                 : "0 0 0px transparent"
             }}
             className={cn(
-              "text-9xl font-display font-bold select-none transition-colors duration-100",
+              "text-6xl font-display font-bold select-none transition-colors duration-100",
               active 
                 ? (isBuy ? "text-[hsl(var(--color-buy))]" : "text-[hsl(var(--color-sell))]")
                 : "text-muted-foreground/20"
@@ -51,7 +51,6 @@ export function KeyIndicator({ label, active, type, threshold, currentValue }: K
             {label}
           </motion.div>
           
-          {/* Pulse Ring when active */}
           <AnimatePresence>
             {active && (
               <motion.div
@@ -60,7 +59,7 @@ export function KeyIndicator({ label, active, type, threshold, currentValue }: K
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.5, repeat: Infinity }}
                 className={cn(
-                  "absolute inset-0 rounded-full border-4 opacity-0",
+                  "absolute inset-0 rounded-full border-2 opacity-0",
                   isBuy ? "border-[hsl(var(--color-buy))]" : "border-[hsl(var(--color-sell))]"
                 )}
               />
@@ -68,12 +67,12 @@ export function KeyIndicator({ label, active, type, threshold, currentValue }: K
           </AnimatePresence>
         </div>
 
-        <div className="space-y-1">
-          <p className="font-mono text-2xl font-bold">
-            {currentValue.toFixed(8)} <span className="text-sm font-normal text-muted-foreground">qty</span>
+        <div className="space-y-0.5">
+          <p className="font-mono text-xs text-muted-foreground">
+            {Number(currentValue || 0).toFixed(8)}
           </p>
-          <p className="text-xs text-muted-foreground">
-            Threshold: {Number(threshold).toFixed(8)}
+          <p className="text-[10px] text-muted-foreground/50">
+            Range: {Number(min || 0).toFixed(8)} - {Number(max || 0).toFixed(8)}
           </p>
         </div>
       </div>
