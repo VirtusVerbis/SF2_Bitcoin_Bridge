@@ -36,7 +36,7 @@ export function useBinanceSocket(symbol: string, isEnabled: boolean = true) {
     setData({ buyQuantity: 0, sellQuantity: 0, lastPrice: 0 });
     accumulators.current = { buy: 0, sell: 0 };
     
-    const wsUrl = `wss://stream.binance.us:9443/ws/${symbol.toLowerCase()}@aggTrade`;
+    const wsUrl = `wss://data-stream.binance.vision/ws/${symbol.toLowerCase()}@aggTrade`;
     
     try {
       setStatus('connecting');
