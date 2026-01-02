@@ -83,29 +83,29 @@ class CryptoMAMEBridge:
         """Parse a command string and return (CommandType, tokens)"""
         if not command or not command.strip():
             return None, []
-        
+
         command = command.lower().strip()
-        
+
         if '+' in command:
             tokens = [t.strip() for t in command.split('+') if t.strip()]
             valid_tokens = [t for t in tokens if len(t) == 1 and t in ALLOWED_KEYS]
             if len(valid_tokens) != len(tokens):
                 logger.warning(f"Some tokens in simultaneous command '{command}' are invalid")
             return CommandType.SIMULTANEOUS, valid_tokens
-        
+
         if ',' in command:
             tokens = [t.strip() for t in command.split(',') if t.strip()]
             valid_tokens = [t for t in tokens if len(t) == 1 and t in ALLOWED_KEYS]
             if len(valid_tokens) != len(tokens):
                 logger.warning(f"Some tokens in sequential command '{command}' are invalid")
             return CommandType.SEQUENTIAL, valid_tokens
-        
+
         if len(command) > 1 and len(set(command)) == 1 and command[0] in ALLOWED_KEYS:
             return CommandType.RAPID_REPEAT, [command[0]] * len(command)
-        
+
         if len(command) == 1 and command in ALLOWED_KEYS:
             return CommandType.SINGLE, [command]
-        
+
         logger.warning(f"Unable to parse command: '{command}'")
         return None, []
 
@@ -134,27 +134,42 @@ class CryptoMAMEBridge:
         if not tokens:
             return
         logger.info(f"Executing sequential: {tokens}")
-        
+
         if len(tokens) == 1:
             self.keyboard.press(tokens[0])
             time.sleep(0.067)
             self.keyboard.release(tokens[0])
             return
-        
+
         for i, key in enumerate(tokens[:-2]):
             self.keyboard.press(key)
-            time.sleep(0.016)
+            time.sleep(0.033)
+
             self.keyboard.release(key)
-            time.sleep(0.010)
-        
+
+            #time.sleep(0.017)
+
+
+        third_last = tokens[-3]
         second_last = tokens[-2]
         last = tokens[-1]
+
+        self.keyboard.press(third_last)
         self.keyboard.press(second_last)
-        time.sleep(0.016)
+        time.sleep(0.033)
+
+        self.keyboard.release(third_last)
+
+        time.sleep(0.017)
+
+        #time.sleep(0.017)
+
         self.keyboard.press(last)
-        time.sleep(0.067)
-        self.keyboard.release(last)
+        #time.sleep(0.067)    
+        time.sleep(0.033)   
+
         self.keyboard.release(second_last)
+        self.keyboard.release(last)
 
     def execute_simultaneous(self, tokens):
         """Execute simultaneous key press (chord)
@@ -182,16 +197,16 @@ class CryptoMAMEBridge:
         if special_name in self.special_cooldowns:
             if now - self.special_cooldowns[special_name] < self.special_cooldown_time:
                 return
-        
+
         self.special_cooldowns[special_name] = now
-        
+
         cmd_type, tokens = self.parse_command(command)
         if cmd_type is None or not tokens:
             logger.warning(f"Invalid special command for {special_name}: '{command}'")
             return
-        
+
         logger.info(f"Triggering special move {special_name}: {command}")
-        
+
         if cmd_type == CommandType.RAPID_REPEAT:
             self.execute_rapid_repeat(tokens)
         elif cmd_type == CommandType.SEQUENTIAL:
@@ -205,18 +220,18 @@ class CryptoMAMEBridge:
         """Check if quantity triggers any special moves for the given exchange and signal type"""
         if not self.config or not self.config.get('isActive'):
             return
-        
+
         prefix = 'binance' if exchange == 'binance' else 'coinbase'
-        
+
         for i in range(1, 4):
             special_signal = self.config.get(f"{prefix}Special{i}Signal", "buy")
             if special_signal != signal_type:
                 continue
-            
+
             min_val = float(self.config.get(f"{prefix}Special{i}Min", 0))
             max_val = float(self.config.get(f"{prefix}Special{i}Max", 0))
             command = self.config.get(f"{prefix}Special{i}Command", "")
-            
+
             if min_val <= quantity <= max_val and command:
                 self.execute_special_command(command, f"{prefix}Special{i}")
                 break
@@ -226,7 +241,7 @@ class CryptoMAMEBridge:
             data = json.loads(message)
             quantity = float(data.get('q', 0))
             is_buyer_maker = data.get('m', False)
-            
+
             # Binance Buy = Punches, Sell = Kicks
             if not is_buyer_maker: # Buy
                 self.check_range_and_press(quantity, 'binanceBuy')
@@ -244,7 +259,7 @@ class CryptoMAMEBridge:
                 return
             quantity = float(data.get('size', 0))
             side = data.get('side', '')
-            
+
             # Coinbase Buy = Punches, Sell = Kicks
             if side == 'buy':
                 self.check_range_and_press(quantity, 'coinbaseBuy')
@@ -257,7 +272,7 @@ class CryptoMAMEBridge:
 
     # WebSocket setup methods omitted for brevity, logic remains same as original
     # but uses the new check_range_and_press method in on_message handlers
-    
+
     def connect_binance(self):
         from websocket import WebSocketApp
         symbol = self.config['symbol'].lower()
@@ -286,5 +301,9 @@ class CryptoMAMEBridge:
 if __name__ == "__main__":
     import os
     # Update this with your actual dashboard URL if running remotely
-    bridge = CryptoMAMEBridge()
+     #bridge = CryptoMAMEBridge()
+    bridge = CryptoMAMEBridge(dashboard_url="https://01d3b94d-949b-4da2-9756-6701b7e2206c-00-l9ynzecjxojp.worf.replit.dev/")
+
+
+
     bridge.run()
