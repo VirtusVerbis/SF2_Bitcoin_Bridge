@@ -129,21 +129,32 @@ class CryptoMAMEBridge:
         SF2 timing: 16ms press + 10ms gap = ~26ms per input (~1.5 frames at 60fps)
         A 3-input motion (e.g. d,df,f for hadouken) completes in ~78ms (5 frames)
         Well within the 10-12 frame window required for special move registration
-        Final key held longer (67ms = 4 frames) to ensure move registration
+        Last two keys held together and released together for better move registration
         """
         if not tokens:
             return
         logger.info(f"Executing sequential: {tokens}")
-        for i, key in enumerate(tokens):
-            is_last_key = (i == len(tokens) - 1)
+        
+        if len(tokens) == 1:
+            self.keyboard.press(tokens[0])
+            time.sleep(0.067)
+            self.keyboard.release(tokens[0])
+            return
+        
+        for i, key in enumerate(tokens[:-2]):
             self.keyboard.press(key)
-            if is_last_key:
-                time.sleep(0.067)
-            else:
-                time.sleep(0.016)
+            time.sleep(0.016)
             self.keyboard.release(key)
-            if not is_last_key:
-                time.sleep(0.010)
+            time.sleep(0.010)
+        
+        second_last = tokens[-2]
+        last = tokens[-1]
+        self.keyboard.press(second_last)
+        time.sleep(0.016)
+        self.keyboard.press(last)
+        time.sleep(0.067)
+        self.keyboard.release(last)
+        self.keyboard.release(second_last)
 
     def execute_simultaneous(self, tokens):
         """Execute simultaneous key press (chord)
