@@ -26,8 +26,75 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Settings, Loader2, Save, Activity, Zap } from "lucide-react";
+import { Settings, Loader2, Save, Activity, Zap, RotateCcw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+
+// Default configuration values matching schema defaults
+const DEFAULT_CONFIGURATION = {
+  symbol: "btcusdt",
+  isActive: true,
+  binanceBuyWeakMin: 0.00001,
+  binanceBuyWeakMax: 0.00009999,
+  binanceBuyWeakKey: "x",
+  binanceBuyMedMin: 0.0001,
+  binanceBuyMedMax: 0.00099999,
+  binanceBuyMedKey: "c",
+  binanceBuyStrongMin: 0.001,
+  binanceBuyStrongMax: 0.00999999,
+  binanceBuyStrongKey: "v",
+  binanceSellWeakMin: 0.00001,
+  binanceSellWeakMax: 0.00009999,
+  binanceSellWeakKey: "y",
+  binanceSellMedMin: 0.0001,
+  binanceSellMedMax: 0.00099999,
+  binanceSellMedKey: "u",
+  binanceSellStrongMin: 0.001,
+  binanceSellStrongMax: 0.00999999,
+  binanceSellStrongKey: "i",
+  coinbaseSymbol: "BTC-USD",
+  coinbaseBuyWeakMin: 0.00001,
+  coinbaseBuyWeakMax: 0.00009999,
+  coinbaseBuyWeakKey: "a",
+  coinbaseBuyMedMin: 0.0001,
+  coinbaseBuyMedMax: 0.00099999,
+  coinbaseBuyMedKey: "s",
+  coinbaseBuyStrongMin: 0.001,
+  coinbaseBuyStrongMax: 0.00999999,
+  coinbaseBuyStrongKey: "d",
+  coinbaseSellWeakMin: 0.00001,
+  coinbaseSellWeakMax: 0.00009999,
+  coinbaseSellWeakKey: "b",
+  coinbaseSellMedMin: 0.0001,
+  coinbaseSellMedMax: 0.00099999,
+  coinbaseSellMedKey: "n",
+  coinbaseSellStrongMin: 0.001,
+  coinbaseSellStrongMax: 0.00999999,
+  coinbaseSellStrongKey: "m",
+  binanceSpecial1Min: 0.01,
+  binanceSpecial1Max: 0.09999999,
+  binanceSpecial1Signal: "buy" as const,
+  binanceSpecial1Command: "d,f,x",
+  binanceSpecial2Min: 0.1,
+  binanceSpecial2Max: 0.49999999,
+  binanceSpecial2Signal: "buy" as const,
+  binanceSpecial2Command: "d,b,y",
+  binanceSpecial3Min: 0.5,
+  binanceSpecial3Max: 0.99999999,
+  binanceSpecial3Signal: "sell" as const,
+  binanceSpecial3Command: "b,d,f+x",
+  coinbaseSpecial1Min: 0.01,
+  coinbaseSpecial1Max: 0.09999999,
+  coinbaseSpecial1Signal: "buy" as const,
+  coinbaseSpecial1Command: "d,f,a",
+  coinbaseSpecial2Min: 0.1,
+  coinbaseSpecial2Max: 0.49999999,
+  coinbaseSpecial2Signal: "buy" as const,
+  coinbaseSpecial2Command: "d,b,b",
+  coinbaseSpecial3Min: 0.5,
+  coinbaseSpecial3Max: 0.99999999,
+  coinbaseSpecial3Signal: "sell" as const,
+  coinbaseSpecial3Command: "b,d,f+a",
+};
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -463,7 +530,17 @@ export function ConfigPanel({ config }: ConfigPanelProps) {
               </div>
             </ScrollArea>
             
-            <DialogFooter className="p-6 bg-secondary/10 border-t">
+            <DialogFooter className="p-6 bg-secondary/10 border-t gap-2">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => form.reset(DEFAULT_CONFIGURATION)}
+                data-testid="button-restore-defaults"
+              >
+                <RotateCcw className="w-4 h-4 mr-2" />
+                Restore Defaults
+              </Button>
+              <div className="flex-1" />
               <Button type="button" variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
               <Button type="submit" disabled={updateConfig.isPending}>
                 {updateConfig.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
