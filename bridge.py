@@ -110,7 +110,9 @@ class CryptoMAMEBridge:
         return None, []
 
     def execute_rapid_repeat(self, tokens):
-        """Execute rapid key mashing - same key pressed multiple times quickly"""
+        """Execute rapid key mashing - same key pressed multiple times quickly
+        SF2 timing: 33ms press + 17ms gap = 50ms per input (3 frames at 60fps)
+        """
         if not tokens:
             return
         key = tokens[0]
@@ -118,23 +120,30 @@ class CryptoMAMEBridge:
         logger.info(f"Executing rapid repeat: key '{key}' x{count}")
         for _ in range(count):
             self.keyboard.press(key)
-            time.sleep(0.045)
+            time.sleep(0.033)
             self.keyboard.release(key)
-            time.sleep(0.035)
+            time.sleep(0.017)
 
     def execute_sequential(self, tokens):
-        """Execute sequential key presses with normal timing"""
+        """Execute sequential key presses for special move inputs
+        SF2 timing: 16ms press + 10ms gap = ~26ms per input (~1.5 frames at 60fps)
+        A 3-input motion (e.g. d,df,f for hadouken) completes in ~78ms (5 frames)
+        Well within the 10-12 frame window required for special move registration
+        """
         if not tokens:
             return
         logger.info(f"Executing sequential: {tokens}")
         for key in tokens:
             self.keyboard.press(key)
-            time.sleep(0.07)
+            time.sleep(0.016)
             self.keyboard.release(key)
-            time.sleep(0.08)
+            time.sleep(0.010)
 
     def execute_simultaneous(self, tokens):
-        """Execute simultaneous key press (chord)"""
+        """Execute simultaneous key press (chord)
+        SF2 timing: 30ms stagger between presses, 100ms hold, then release
+        This ensures all keys register as pressed together for chord inputs
+        """
         if not tokens:
             return
         logger.info(f"Executing simultaneous: {tokens}")
