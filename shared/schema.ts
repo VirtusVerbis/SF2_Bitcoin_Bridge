@@ -59,6 +59,38 @@ export const configurations = pgTable("configurations", {
   coinbaseSellStrongMin: numeric("coinbase_sell_strong_min", { precision: 18, scale: 8 }).notNull().default("0.00100000"),
   coinbaseSellStrongMax: numeric("coinbase_sell_strong_max", { precision: 18, scale: 8 }).notNull().default("0.00999999"),
   coinbaseSellStrongKey: text("coinbase_sell_strong_key").notNull().default("m"),
+
+  // Binance Special Moves (P1)
+  binanceSpecial1Min: numeric("binance_special1_min", { precision: 18, scale: 8 }).notNull().default("0.01000000"),
+  binanceSpecial1Max: numeric("binance_special1_max", { precision: 18, scale: 8 }).notNull().default("0.09999999"),
+  binanceSpecial1Signal: text("binance_special1_signal").notNull().default("buy"),
+  binanceSpecial1Command: text("binance_special1_command").notNull().default("d,f,x"),
+
+  binanceSpecial2Min: numeric("binance_special2_min", { precision: 18, scale: 8 }).notNull().default("0.10000000"),
+  binanceSpecial2Max: numeric("binance_special2_max", { precision: 18, scale: 8 }).notNull().default("0.49999999"),
+  binanceSpecial2Signal: text("binance_special2_signal").notNull().default("buy"),
+  binanceSpecial2Command: text("binance_special2_command").notNull().default("d,b,y"),
+
+  binanceSpecial3Min: numeric("binance_special3_min", { precision: 18, scale: 8 }).notNull().default("0.50000000"),
+  binanceSpecial3Max: numeric("binance_special3_max", { precision: 18, scale: 8 }).notNull().default("0.99999999"),
+  binanceSpecial3Signal: text("binance_special3_signal").notNull().default("sell"),
+  binanceSpecial3Command: text("binance_special3_command").notNull().default("b,d,f+x"),
+
+  // Coinbase Special Moves (P2)
+  coinbaseSpecial1Min: numeric("coinbase_special1_min", { precision: 18, scale: 8 }).notNull().default("0.01000000"),
+  coinbaseSpecial1Max: numeric("coinbase_special1_max", { precision: 18, scale: 8 }).notNull().default("0.09999999"),
+  coinbaseSpecial1Signal: text("coinbase_special1_signal").notNull().default("buy"),
+  coinbaseSpecial1Command: text("coinbase_special1_command").notNull().default("d,f,a"),
+
+  coinbaseSpecial2Min: numeric("coinbase_special2_min", { precision: 18, scale: 8 }).notNull().default("0.10000000"),
+  coinbaseSpecial2Max: numeric("coinbase_special2_max", { precision: 18, scale: 8 }).notNull().default("0.49999999"),
+  coinbaseSpecial2Signal: text("coinbase_special2_signal").notNull().default("buy"),
+  coinbaseSpecial2Command: text("coinbase_special2_command").notNull().default("d,b,b"),
+
+  coinbaseSpecial3Min: numeric("coinbase_special3_min", { precision: 18, scale: 8 }).notNull().default("0.50000000"),
+  coinbaseSpecial3Max: numeric("coinbase_special3_max", { precision: 18, scale: 8 }).notNull().default("0.99999999"),
+  coinbaseSpecial3Signal: text("coinbase_special3_signal").notNull().default("sell"),
+  coinbaseSpecial3Command: text("coinbase_special3_command").notNull().default("b,d,f+a"),
 });
 
 const numericField = z.union([z.string(), z.number()]).pipe(z.coerce.string());
@@ -88,6 +120,18 @@ export const insertConfigurationSchema = createInsertSchema(configurations).omit
   coinbaseSellMedMax: numericField,
   coinbaseSellStrongMin: numericField,
   coinbaseSellStrongMax: numericField,
+  binanceSpecial1Min: numericField,
+  binanceSpecial1Max: numericField,
+  binanceSpecial2Min: numericField,
+  binanceSpecial2Max: numericField,
+  binanceSpecial3Min: numericField,
+  binanceSpecial3Max: numericField,
+  coinbaseSpecial1Min: numericField,
+  coinbaseSpecial1Max: numericField,
+  coinbaseSpecial2Min: numericField,
+  coinbaseSpecial2Max: numericField,
+  coinbaseSpecial3Min: numericField,
+  coinbaseSpecial3Max: numericField,
 });
 
 export type Configuration = typeof configurations.$inferSelect;
