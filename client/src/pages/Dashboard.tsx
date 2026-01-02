@@ -4,7 +4,7 @@ import { useCoinbaseSocket } from "@/hooks/use-coinbase-socket";
 import { ConfigPanel } from "@/components/ConfigPanel";
 import { KeyIndicator } from "@/components/KeyIndicator";
 import { VolumeChart } from "@/components/VolumeChart";
-import { Activity, AlertTriangle, Cpu, Terminal, Wifi } from "lucide-react";
+import { Activity, AlertTriangle, Cpu, Terminal, Wifi, Zap } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
@@ -85,6 +85,60 @@ export default function Dashboard() {
             max={Number(config[`${prefix}StrongMax`])}
             currentValue={data[`${type}Quantity`]}
           />
+        </div>
+      </div>
+    );
+  };
+
+  const renderSpecialMoves = (
+    player: string,
+    data: any,
+    prefix: "binance" | "coinbase"
+  ) => {
+    const specials = [
+      { id: "1", name: "SP1", color: "from-purple-500 to-purple-700" },
+      { id: "2", name: "SP2", color: "from-cyan-500 to-cyan-700" },
+      { id: "3", name: "SP3", color: "from-orange-500 to-orange-700" },
+    ];
+
+    return (
+      <div className="space-y-3">
+        <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 flex items-center gap-1">
+          <Zap className="w-3 h-3 text-yellow-400" />
+          {player} Special Moves
+        </div>
+        <div className="grid grid-cols-3 gap-2">
+          {specials.map((special) => {
+            const signalType = config[`${prefix}Special${special.id}Signal` as keyof typeof config] as string;
+            const minVal = Number(config[`${prefix}Special${special.id}Min` as keyof typeof config]);
+            const maxVal = Number(config[`${prefix}Special${special.id}Max` as keyof typeof config]);
+            const command = config[`${prefix}Special${special.id}Command` as keyof typeof config] as string;
+            const quantity = signalType === 'buy' ? data.buyQuantity : data.sellQuantity;
+            const isActive = config.isActive && quantity >= minVal && quantity <= maxVal && command;
+            
+            return (
+              <div 
+                key={special.id}
+                data-testid={`special-indicator-${prefix}-${special.id}`}
+                className={cn(
+                  "relative rounded-lg p-2 border transition-all duration-150 overflow-hidden",
+                  isActive 
+                    ? `bg-gradient-to-br ${special.color} border-white/30 shadow-lg animate-pulse` 
+                    : "bg-black/20 border-white/5"
+                )}
+              >
+                <div className="text-[10px] font-bold uppercase text-center">
+                  {special.name}
+                </div>
+                <div className="text-[8px] text-center text-white/50 truncate">
+                  {command || "---"}
+                </div>
+                {isActive && (
+                  <div className="absolute inset-0 bg-white/10 animate-ping pointer-events-none" />
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
     );
@@ -183,6 +237,7 @@ export default function Dashboard() {
             <div className="space-y-6">
               {renderPlayerControls("P1", binanceData, "binanceBuy")}
               {renderPlayerControls("P1", binanceData, "binanceSell")}
+              {renderSpecialMoves("P1", binanceData, "binance")}
             </div>
           </div>
           
@@ -191,6 +246,7 @@ export default function Dashboard() {
             <div className="space-y-6">
               {renderPlayerControls("P2", coinbaseData, "coinbaseBuy")}
               {renderPlayerControls("P2", coinbaseData, "coinbaseSell")}
+              {renderSpecialMoves("P2", coinbaseData, "coinbase")}
             </div>
           </div>
         </div>
