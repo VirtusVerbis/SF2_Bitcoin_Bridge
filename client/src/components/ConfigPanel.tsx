@@ -182,7 +182,7 @@ export function ConfigPanel({ config }: ConfigPanelProps) {
                 <FormItem className="col-span-4">
                   <FormLabel className="text-[9px] uppercase font-bold text-muted-foreground/50">Min Qty</FormLabel>
                   <FormControl>
-                    <Input type="number" step="0.00000001" {...field} className="h-8 text-[11px] font-mono px-2 bg-black/20" />
+                    <Input type="number" step="0.000000001" {...field} className="h-8 text-[11px] font-mono px-2 bg-black/20" />
                   </FormControl>
                 </FormItem>
               )}
@@ -194,7 +194,7 @@ export function ConfigPanel({ config }: ConfigPanelProps) {
                 <FormItem className="col-span-4">
                   <FormLabel className="text-[9px] uppercase font-bold text-muted-foreground/50">Max Qty</FormLabel>
                   <FormControl>
-                    <Input type="number" step="0.00000001" {...field} className="h-8 text-[11px] font-mono px-2 bg-black/20" />
+                    <Input type="number" step="0.000000001" {...field} className="h-8 text-[11px] font-mono px-2 bg-black/20" />
                   </FormControl>
                 </FormItem>
               )}
@@ -232,7 +232,7 @@ export function ConfigPanel({ config }: ConfigPanelProps) {
             Street Fighter II Controller Configuration
           </DialogTitle>
           <DialogDescription>
-            Map crypto trade quantities to arcade buttons. Set 8-decimal ranges for Weak, Medium, and Strong attacks.
+            Map crypto trade quantities to arcade buttons. Set 9-decimal ranges for Weak, Medium, and Strong attacks.
           </DialogDescription>
         </DialogHeader>
 
