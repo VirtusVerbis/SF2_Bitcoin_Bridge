@@ -179,7 +179,7 @@ export function ConfigPanel({ config }: ConfigPanelProps) {
               control={form.control}
               name={`${prefix}${level.id}Min` as any}
               render={({ field }) => (
-                <FormItem className="col-span-4">
+                <FormItem className="col-span-5">
                   <FormLabel className="text-[9px] uppercase font-bold text-muted-foreground/50">Min Qty</FormLabel>
                   <FormControl>
                     <Input type="number" step="0.000000001" {...field} className="h-8 text-[11px] font-mono px-2 bg-black/20" />
@@ -191,7 +191,7 @@ export function ConfigPanel({ config }: ConfigPanelProps) {
               control={form.control}
               name={`${prefix}${level.id}Max` as any}
               render={({ field }) => (
-                <FormItem className="col-span-4">
+                <FormItem className="col-span-5">
                   <FormLabel className="text-[9px] uppercase font-bold text-muted-foreground/50">Max Qty</FormLabel>
                   <FormControl>
                     <Input type="number" step="0.000000001" {...field} className="h-8 text-[11px] font-mono px-2 bg-black/20" />
@@ -203,10 +203,9 @@ export function ConfigPanel({ config }: ConfigPanelProps) {
               control={form.control}
               name={`${prefix}${level.id}Key` as any}
               render={({ field }) => (
-                <FormItem className="col-span-2">
-                  <FormLabel className="text-[9px] uppercase font-bold text-muted-foreground/50">Key</FormLabel>
+                <FormItem className="hidden">
                   <FormControl>
-                    <Input {...field} maxLength={1} className="h-8 text-[11px] px-0 text-center font-mono uppercase bg-primary/10 border-primary/30" />
+                    <Input {...field} />
                   </FormControl>
                 </FormItem>
               )}
