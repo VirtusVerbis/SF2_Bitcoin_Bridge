@@ -150,8 +150,8 @@ export default function Dashboard() {
     prefix: "binance" | "coinbase"
   ) => {
     const movements = [
-      { id: "MoveForward", name: "FWD", color: "from-green-500 to-green-700", icon: MoveRight },
       { id: "MoveBackward", name: "BWD", color: "from-red-500 to-red-700", icon: MoveLeft },
+      { id: "MoveForward", name: "FWD", color: "from-green-500 to-green-700", icon: MoveRight },
     ];
 
     return (
