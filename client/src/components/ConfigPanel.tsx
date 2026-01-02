@@ -25,7 +25,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Settings, Loader2, Save, Activity } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Settings, Loader2, Save, Activity, Zap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -59,6 +60,18 @@ const formSchema = insertConfigurationSchema.extend({
   coinbaseSellMedMax: z.coerce.number().min(0),
   coinbaseSellStrongMin: z.coerce.number().min(0),
   coinbaseSellStrongMax: z.coerce.number().min(0),
+  binanceSpecial1Min: z.coerce.number().min(0),
+  binanceSpecial1Max: z.coerce.number().min(0),
+  binanceSpecial2Min: z.coerce.number().min(0),
+  binanceSpecial2Max: z.coerce.number().min(0),
+  binanceSpecial3Min: z.coerce.number().min(0),
+  binanceSpecial3Max: z.coerce.number().min(0),
+  coinbaseSpecial1Min: z.coerce.number().min(0),
+  coinbaseSpecial1Max: z.coerce.number().min(0),
+  coinbaseSpecial2Min: z.coerce.number().min(0),
+  coinbaseSpecial2Max: z.coerce.number().min(0),
+  coinbaseSpecial3Min: z.coerce.number().min(0),
+  coinbaseSpecial3Max: z.coerce.number().min(0),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -110,6 +123,30 @@ export function ConfigPanel({ config }: ConfigPanelProps) {
       coinbaseSellStrongMin: Number(config.coinbaseSellStrongMin),
       coinbaseSellStrongMax: Number(config.coinbaseSellStrongMax),
       coinbaseSellStrongKey: config.coinbaseSellStrongKey,
+      binanceSpecial1Min: Number(config.binanceSpecial1Min),
+      binanceSpecial1Max: Number(config.binanceSpecial1Max),
+      binanceSpecial1Signal: config.binanceSpecial1Signal,
+      binanceSpecial1Command: config.binanceSpecial1Command,
+      binanceSpecial2Min: Number(config.binanceSpecial2Min),
+      binanceSpecial2Max: Number(config.binanceSpecial2Max),
+      binanceSpecial2Signal: config.binanceSpecial2Signal,
+      binanceSpecial2Command: config.binanceSpecial2Command,
+      binanceSpecial3Min: Number(config.binanceSpecial3Min),
+      binanceSpecial3Max: Number(config.binanceSpecial3Max),
+      binanceSpecial3Signal: config.binanceSpecial3Signal,
+      binanceSpecial3Command: config.binanceSpecial3Command,
+      coinbaseSpecial1Min: Number(config.coinbaseSpecial1Min),
+      coinbaseSpecial1Max: Number(config.coinbaseSpecial1Max),
+      coinbaseSpecial1Signal: config.coinbaseSpecial1Signal,
+      coinbaseSpecial1Command: config.coinbaseSpecial1Command,
+      coinbaseSpecial2Min: Number(config.coinbaseSpecial2Min),
+      coinbaseSpecial2Max: Number(config.coinbaseSpecial2Max),
+      coinbaseSpecial2Signal: config.coinbaseSpecial2Signal,
+      coinbaseSpecial2Command: config.coinbaseSpecial2Command,
+      coinbaseSpecial3Min: Number(config.coinbaseSpecial3Min),
+      coinbaseSpecial3Max: Number(config.coinbaseSpecial3Max),
+      coinbaseSpecial3Signal: config.coinbaseSpecial3Signal,
+      coinbaseSpecial3Command: config.coinbaseSpecial3Command,
     },
   });
 
@@ -141,6 +178,18 @@ export function ConfigPanel({ config }: ConfigPanelProps) {
         coinbaseSellMedMax: Number(config.coinbaseSellMedMax),
         coinbaseSellStrongMin: Number(config.coinbaseSellStrongMin),
         coinbaseSellStrongMax: Number(config.coinbaseSellStrongMax),
+        binanceSpecial1Min: Number(config.binanceSpecial1Min),
+        binanceSpecial1Max: Number(config.binanceSpecial1Max),
+        binanceSpecial2Min: Number(config.binanceSpecial2Min),
+        binanceSpecial2Max: Number(config.binanceSpecial2Max),
+        binanceSpecial3Min: Number(config.binanceSpecial3Min),
+        binanceSpecial3Max: Number(config.binanceSpecial3Max),
+        coinbaseSpecial1Min: Number(config.coinbaseSpecial1Min),
+        coinbaseSpecial1Max: Number(config.coinbaseSpecial1Max),
+        coinbaseSpecial2Min: Number(config.coinbaseSpecial2Min),
+        coinbaseSpecial2Max: Number(config.coinbaseSpecial2Max),
+        coinbaseSpecial3Min: Number(config.coinbaseSpecial3Min),
+        coinbaseSpecial3Max: Number(config.coinbaseSpecial3Max),
       } as any);
     }
   }, [config, form]);
@@ -216,6 +265,89 @@ export function ConfigPanel({ config }: ConfigPanelProps) {
     );
   };
 
+  const renderSpecialMoveFields = (prefix: string) => {
+    const specials = [
+      { id: "1", name: "Special 1", color: "text-purple-400" },
+      { id: "2", name: "Special 2", color: "text-cyan-400" },
+      { id: "3", name: "Special 3", color: "text-orange-400" },
+    ];
+
+    return (
+      <div className="space-y-4">
+        <h4 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground/70 flex items-center gap-2">
+          <Zap className="w-4 h-4 text-yellow-400" />
+          Special Moves
+        </h4>
+        <p className="text-[10px] text-muted-foreground/60 -mt-2">
+          Commands: "xxx" (rapid), "x,y,z" (sequence), "x+y" (simultaneous)
+        </p>
+        {specials.map((special) => (
+          <div key={special.id} className="space-y-2 p-3 rounded-lg bg-gradient-to-r from-purple-500/10 to-cyan-500/10 border border-purple-500/20">
+            <div className={`text-[10px] font-bold uppercase ${special.color}`}>{special.name}</div>
+            <div className="grid grid-cols-12 gap-2 items-end">
+              <FormField
+                control={form.control}
+                name={`${prefix}Special${special.id}Min` as any}
+                render={({ field }) => (
+                  <FormItem className="col-span-3">
+                    <FormLabel className="text-[9px] uppercase font-bold text-muted-foreground/50">Min Qty</FormLabel>
+                    <FormControl>
+                      <Input type="number" step="0.000000001" {...field} className="h-8 text-[11px] font-mono px-2 bg-black/20" />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name={`${prefix}Special${special.id}Max` as any}
+                render={({ field }) => (
+                  <FormItem className="col-span-3">
+                    <FormLabel className="text-[9px] uppercase font-bold text-muted-foreground/50">Max Qty</FormLabel>
+                    <FormControl>
+                      <Input type="number" step="0.000000001" {...field} className="h-8 text-[11px] font-mono px-2 bg-black/20" />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name={`${prefix}Special${special.id}Signal` as any}
+                render={({ field }) => (
+                  <FormItem className="col-span-2">
+                    <FormLabel className="text-[9px] uppercase font-bold text-muted-foreground/50">Signal</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="h-8 text-[11px] bg-black/20">
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="buy">Buy</SelectItem>
+                        <SelectItem value="sell">Sell</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name={`${prefix}Special${special.id}Command` as any}
+                render={({ field }) => (
+                  <FormItem className="col-span-4">
+                    <FormLabel className="text-[9px] uppercase font-bold text-muted-foreground/50">Command</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="d,f,x" className="h-8 text-[11px] font-mono px-2 bg-black/20" />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -279,6 +411,7 @@ export function ConfigPanel({ config }: ConfigPanelProps) {
                       {renderRangeFields("binanceBuy", "P1 Punches (Buy Signal)")}
                       {renderRangeFields("binanceSell", "P1 Kicks (Sell Signal)")}
                     </div>
+                    {renderSpecialMoveFields("binance")}
                   </TabsContent>
 
                   <TabsContent value="coinbase" className="space-y-6 pt-4">
@@ -299,6 +432,7 @@ export function ConfigPanel({ config }: ConfigPanelProps) {
                       {renderRangeFields("coinbaseBuy", "P2 Punches (Buy Signal)")}
                       {renderRangeFields("coinbaseSell", "P2 Kicks (Sell Signal)")}
                     </div>
+                    {renderSpecialMoveFields("coinbase")}
                   </TabsContent>
                 </Tabs>
               </div>
