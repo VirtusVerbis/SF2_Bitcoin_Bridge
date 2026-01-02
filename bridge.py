@@ -236,6 +236,27 @@ class CryptoMAMEBridge:
                 self.execute_special_command(command, f"{prefix}Special{i}")
                 break
 
+    def check_movement_controls(self, quantity, exchange, signal_type):
+        """Check if quantity triggers movement controls (Forward/Backward) for the given exchange and signal type"""
+        if not self.config or not self.config.get('isActive'):
+            return
+
+        prefix = 'binance' if exchange == 'binance' else 'coinbase'
+
+        movements = ['MoveForward', 'MoveBackward']
+        for movement in movements:
+            movement_signal = self.config.get(f"{prefix}{movement}Signal", "buy")
+            if movement_signal != signal_type:
+                continue
+
+            min_val = float(self.config.get(f"{prefix}{movement}Min", 0))
+            max_val = float(self.config.get(f"{prefix}{movement}Max", 0))
+            key = self.config.get(f"{prefix}{movement}Key", "")
+
+            if min_val <= quantity <= max_val and key:
+                logger.info(f"Triggering {movement} ({prefix}) with key {key} (Qty: {quantity})")
+                self.press_key(key)
+
     def on_binance_message(self, ws, message):
         try:
             data = json.loads(message)
@@ -246,9 +267,11 @@ class CryptoMAMEBridge:
             if not is_buyer_maker: # Buy
                 self.check_range_and_press(quantity, 'binanceBuy')
                 self.check_special_moves(quantity, 'binance', 'buy')
+                self.check_movement_controls(quantity, 'binance', 'buy')
             else: # Sell
                 self.check_range_and_press(quantity, 'binanceSell')
                 self.check_special_moves(quantity, 'binance', 'sell')
+                self.check_movement_controls(quantity, 'binance', 'sell')
         except Exception as e:
             logger.error(f"Binance error: {e}")
 
@@ -264,9 +287,11 @@ class CryptoMAMEBridge:
             if side == 'buy':
                 self.check_range_and_press(quantity, 'coinbaseBuy')
                 self.check_special_moves(quantity, 'coinbase', 'buy')
+                self.check_movement_controls(quantity, 'coinbase', 'buy')
             elif side == 'sell':
                 self.check_range_and_press(quantity, 'coinbaseSell')
                 self.check_special_moves(quantity, 'coinbase', 'sell')
+                self.check_movement_controls(quantity, 'coinbase', 'sell')
         except Exception as e:
             logger.error(f"Coinbase error: {e}")
 
