@@ -91,6 +91,28 @@ export const configurations = pgTable("configurations", {
   coinbaseSpecial3Max: numeric("coinbase_special3_max", { precision: 18, scale: 8 }).notNull().default("0.99999999"),
   coinbaseSpecial3Signal: text("coinbase_special3_signal").notNull().default("sell"),
   coinbaseSpecial3Command: text("coinbase_special3_command").notNull().default("b,d,f+a"),
+
+  // Binance Movement (P1)
+  binanceMoveForwardMin: numeric("binance_move_forward_min", { precision: 18, scale: 8 }).notNull().default("0.00001000"),
+  binanceMoveForwardMax: numeric("binance_move_forward_max", { precision: 18, scale: 8 }).notNull().default("0.00009999"),
+  binanceMoveForwardSignal: text("binance_move_forward_signal").notNull().default("buy"),
+  binanceMoveForwardKey: text("binance_move_forward_key").notNull().default("f"),
+
+  binanceMoveBackwardMin: numeric("binance_move_backward_min", { precision: 18, scale: 8 }).notNull().default("0.00001000"),
+  binanceMoveBackwardMax: numeric("binance_move_backward_max", { precision: 18, scale: 8 }).notNull().default("0.00009999"),
+  binanceMoveBackwardSignal: text("binance_move_backward_signal").notNull().default("sell"),
+  binanceMoveBackwardKey: text("binance_move_backward_key").notNull().default("g"),
+
+  // Coinbase Movement (P2)
+  coinbaseMoveForwardMin: numeric("coinbase_move_forward_min", { precision: 18, scale: 8 }).notNull().default("0.00001000"),
+  coinbaseMoveForwardMax: numeric("coinbase_move_forward_max", { precision: 18, scale: 8 }).notNull().default("0.00009999"),
+  coinbaseMoveForwardSignal: text("coinbase_move_forward_signal").notNull().default("buy"),
+  coinbaseMoveForwardKey: text("coinbase_move_forward_key").notNull().default("l"),
+
+  coinbaseMoveBackwardMin: numeric("coinbase_move_backward_min", { precision: 18, scale: 8 }).notNull().default("0.00001000"),
+  coinbaseMoveBackwardMax: numeric("coinbase_move_backward_max", { precision: 18, scale: 8 }).notNull().default("0.00009999"),
+  coinbaseMoveBackwardSignal: text("coinbase_move_backward_signal").notNull().default("sell"),
+  coinbaseMoveBackwardKey: text("coinbase_move_backward_key").notNull().default("k"),
 });
 
 const numericField = z.union([z.string(), z.number()]).pipe(z.coerce.string());
@@ -132,6 +154,14 @@ export const insertConfigurationSchema = createInsertSchema(configurations).omit
   coinbaseSpecial2Max: numericField,
   coinbaseSpecial3Min: numericField,
   coinbaseSpecial3Max: numericField,
+  binanceMoveForwardMin: numericField,
+  binanceMoveForwardMax: numericField,
+  binanceMoveBackwardMin: numericField,
+  binanceMoveBackwardMax: numericField,
+  coinbaseMoveForwardMin: numericField,
+  coinbaseMoveForwardMax: numericField,
+  coinbaseMoveBackwardMin: numericField,
+  coinbaseMoveBackwardMax: numericField,
 });
 
 export type Configuration = typeof configurations.$inferSelect;
