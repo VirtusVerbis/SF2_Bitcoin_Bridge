@@ -26,7 +26,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Settings, Loader2, Save, Activity, Zap, RotateCcw } from "lucide-react";
+import { Settings, Loader2, Save, Activity, Zap, RotateCcw, MoveRight, MoveLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 // Default configuration values matching schema defaults
@@ -94,6 +94,22 @@ const DEFAULT_CONFIGURATION = {
   coinbaseSpecial3Max: 1000.0,
   coinbaseSpecial3Signal: "buy" as const,
   coinbaseSpecial3Command: "k,l,k,a",
+  binanceMoveForwardMin: 0.00001,
+  binanceMoveForwardMax: 0.00009999,
+  binanceMoveForwardSignal: "buy" as const,
+  binanceMoveForwardKey: "f",
+  binanceMoveBackwardMin: 0.00001,
+  binanceMoveBackwardMax: 0.00009999,
+  binanceMoveBackwardSignal: "sell" as const,
+  binanceMoveBackwardKey: "g",
+  coinbaseMoveForwardMin: 0.00001,
+  coinbaseMoveForwardMax: 0.00009999,
+  coinbaseMoveForwardSignal: "buy" as const,
+  coinbaseMoveForwardKey: "l",
+  coinbaseMoveBackwardMin: 0.00001,
+  coinbaseMoveBackwardMax: 0.00009999,
+  coinbaseMoveBackwardSignal: "sell" as const,
+  coinbaseMoveBackwardKey: "k",
 };
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -151,6 +167,22 @@ const formSchema = insertConfigurationSchema.extend({
   coinbaseSpecial3Max: z.coerce.number().min(0),
   coinbaseSpecial3Signal: z.enum(["buy", "sell"]),
   coinbaseSpecial3Command: z.string(),
+  binanceMoveForwardMin: z.coerce.number().min(0),
+  binanceMoveForwardMax: z.coerce.number().min(0),
+  binanceMoveForwardSignal: z.enum(["buy", "sell"]),
+  binanceMoveForwardKey: z.string().min(1),
+  binanceMoveBackwardMin: z.coerce.number().min(0),
+  binanceMoveBackwardMax: z.coerce.number().min(0),
+  binanceMoveBackwardSignal: z.enum(["buy", "sell"]),
+  binanceMoveBackwardKey: z.string().min(1),
+  coinbaseMoveForwardMin: z.coerce.number().min(0),
+  coinbaseMoveForwardMax: z.coerce.number().min(0),
+  coinbaseMoveForwardSignal: z.enum(["buy", "sell"]),
+  coinbaseMoveForwardKey: z.string().min(1),
+  coinbaseMoveBackwardMin: z.coerce.number().min(0),
+  coinbaseMoveBackwardMax: z.coerce.number().min(0),
+  coinbaseMoveBackwardSignal: z.enum(["buy", "sell"]),
+  coinbaseMoveBackwardKey: z.string().min(1),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -226,6 +258,22 @@ export function ConfigPanel({ config }: ConfigPanelProps) {
       coinbaseSpecial3Max: Number(config.coinbaseSpecial3Max),
       coinbaseSpecial3Signal: config.coinbaseSpecial3Signal,
       coinbaseSpecial3Command: config.coinbaseSpecial3Command,
+      binanceMoveForwardMin: Number(config.binanceMoveForwardMin),
+      binanceMoveForwardMax: Number(config.binanceMoveForwardMax),
+      binanceMoveForwardSignal: config.binanceMoveForwardSignal,
+      binanceMoveForwardKey: config.binanceMoveForwardKey,
+      binanceMoveBackwardMin: Number(config.binanceMoveBackwardMin),
+      binanceMoveBackwardMax: Number(config.binanceMoveBackwardMax),
+      binanceMoveBackwardSignal: config.binanceMoveBackwardSignal,
+      binanceMoveBackwardKey: config.binanceMoveBackwardKey,
+      coinbaseMoveForwardMin: Number(config.coinbaseMoveForwardMin),
+      coinbaseMoveForwardMax: Number(config.coinbaseMoveForwardMax),
+      coinbaseMoveForwardSignal: config.coinbaseMoveForwardSignal,
+      coinbaseMoveForwardKey: config.coinbaseMoveForwardKey,
+      coinbaseMoveBackwardMin: Number(config.coinbaseMoveBackwardMin),
+      coinbaseMoveBackwardMax: Number(config.coinbaseMoveBackwardMax),
+      coinbaseMoveBackwardSignal: config.coinbaseMoveBackwardSignal,
+      coinbaseMoveBackwardKey: config.coinbaseMoveBackwardKey,
     },
   });
 
@@ -281,6 +329,22 @@ export function ConfigPanel({ config }: ConfigPanelProps) {
         coinbaseSpecial3Max: Number(config.coinbaseSpecial3Max),
         coinbaseSpecial3Signal: config.coinbaseSpecial3Signal,
         coinbaseSpecial3Command: config.coinbaseSpecial3Command,
+        binanceMoveForwardMin: Number(config.binanceMoveForwardMin),
+        binanceMoveForwardMax: Number(config.binanceMoveForwardMax),
+        binanceMoveForwardSignal: config.binanceMoveForwardSignal,
+        binanceMoveForwardKey: config.binanceMoveForwardKey,
+        binanceMoveBackwardMin: Number(config.binanceMoveBackwardMin),
+        binanceMoveBackwardMax: Number(config.binanceMoveBackwardMax),
+        binanceMoveBackwardSignal: config.binanceMoveBackwardSignal,
+        binanceMoveBackwardKey: config.binanceMoveBackwardKey,
+        coinbaseMoveForwardMin: Number(config.coinbaseMoveForwardMin),
+        coinbaseMoveForwardMax: Number(config.coinbaseMoveForwardMax),
+        coinbaseMoveForwardSignal: config.coinbaseMoveForwardSignal,
+        coinbaseMoveForwardKey: config.coinbaseMoveForwardKey,
+        coinbaseMoveBackwardMin: Number(config.coinbaseMoveBackwardMin),
+        coinbaseMoveBackwardMax: Number(config.coinbaseMoveBackwardMax),
+        coinbaseMoveBackwardSignal: config.coinbaseMoveBackwardSignal,
+        coinbaseMoveBackwardKey: config.coinbaseMoveBackwardKey,
       } as any);
     }
   }, [config, form]);
@@ -440,6 +504,88 @@ export function ConfigPanel({ config }: ConfigPanelProps) {
     );
   };
 
+  const renderMovementFields = (prefix: string) => {
+    const movements = [
+      { id: "MoveForward", name: "Move Forward", color: "text-green-400", icon: MoveRight },
+      { id: "MoveBackward", name: "Move Backward", color: "text-red-400", icon: MoveLeft },
+    ];
+
+    return (
+      <div className="space-y-4">
+        <h4 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground/70 flex items-center gap-2">
+          <MoveRight className="w-4 h-4 text-green-400" />
+          Movement Controls
+        </h4>
+        {movements.map((move) => (
+          <div key={move.id} className="space-y-2 p-3 rounded-lg bg-gradient-to-r from-green-500/10 to-blue-500/10 border border-green-500/20">
+            <div className={`text-[10px] font-bold uppercase ${move.color} flex items-center gap-1`}>
+              <move.icon className="w-3 h-3" />
+              {move.name}
+            </div>
+            <div className="grid grid-cols-12 gap-2 items-end">
+              <FormField
+                control={form.control}
+                name={`${prefix}${move.id}Min` as any}
+                render={({ field }) => (
+                  <FormItem className="col-span-4">
+                    <FormLabel className="text-[9px] uppercase font-bold text-muted-foreground/50">Min Qty</FormLabel>
+                    <FormControl>
+                      <Input type="number" step="0.000000001" {...field} className="h-8 text-[10px] font-mono px-1 bg-black/20" />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name={`${prefix}${move.id}Max` as any}
+                render={({ field }) => (
+                  <FormItem className="col-span-4">
+                    <FormLabel className="text-[9px] uppercase font-bold text-muted-foreground/50">Max Qty</FormLabel>
+                    <FormControl>
+                      <Input type="number" step="0.000000001" {...field} className="h-8 text-[10px] font-mono px-1 bg-black/20" />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name={`${prefix}${move.id}Signal` as any}
+                render={({ field }) => (
+                  <FormItem className="col-span-2">
+                    <FormLabel className="text-[9px] uppercase font-bold text-muted-foreground/50">Signal</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="h-8 text-[10px] bg-black/20">
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="buy">Buy</SelectItem>
+                        <SelectItem value="sell">Sell</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name={`${prefix}${move.id}Key` as any}
+                render={({ field }) => (
+                  <FormItem className="col-span-2">
+                    <FormLabel className="text-[9px] uppercase font-bold text-muted-foreground/50">Key</FormLabel>
+                    <FormControl>
+                      <Input {...field} maxLength={1} className="h-8 text-[10px] font-mono px-1 bg-black/20 text-center uppercase" />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -504,6 +650,7 @@ export function ConfigPanel({ config }: ConfigPanelProps) {
                       {renderRangeFields("binanceSell", "P1 Kicks (Sell Signal)")}
                     </div>
                     {renderSpecialMoveFields("binance")}
+                    {renderMovementFields("binance")}
                   </TabsContent>
 
                   <TabsContent value="coinbase" className="space-y-6 pt-4">
@@ -525,6 +672,7 @@ export function ConfigPanel({ config }: ConfigPanelProps) {
                       {renderRangeFields("coinbaseSell", "P2 Kicks (Sell Signal)")}
                     </div>
                     {renderSpecialMoveFields("coinbase")}
+                    {renderMovementFields("coinbase")}
                   </TabsContent>
                 </Tabs>
               </div>
