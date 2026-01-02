@@ -254,8 +254,8 @@ class CryptoMAMEBridge:
             key = self.config.get(f"{prefix}{movement}Key", "")
 
             if min_val <= quantity <= max_val and key:
-                logger.info(f"Triggering {movement} ({prefix}) with key {key} (Qty: {quantity})")
-                self.press_key(key)
+                logger.info(f"MOVing {movement} ({prefix}) with key {key} (Qty: {quantity})")
+                self.press_key(key,0.5)
 
     def on_binance_message(self, ws, message):
         try:
@@ -328,7 +328,5 @@ if __name__ == "__main__":
     # Update this with your actual dashboard URL if running remotely
      #bridge = CryptoMAMEBridge()
     bridge = CryptoMAMEBridge(dashboard_url="https://01d3b94d-949b-4da2-9756-6701b7e2206c-00-l9ynzecjxojp.worf.replit.dev/")
-
-
 
     bridge.run()
