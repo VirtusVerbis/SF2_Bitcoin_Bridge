@@ -215,8 +215,8 @@ export default function Dashboard() {
     prefix: "binance" | "coinbase"
   ) => {
     const actions = [
-      { id: "Jump", name: "JMP", color: "from-cyan-500 to-cyan-700" },
-      { id: "Crouch", name: "CRC", color: "from-orange-500 to-orange-700" },
+      { id: "Jump", name: "JMP", color: "from-cyan-500 to-cyan-700", hasDirectional: true },
+      { id: "Crouch", name: "CRC", color: "from-orange-500 to-orange-700", hasDirectional: false },
     ];
 
     return (
@@ -231,6 +231,8 @@ export default function Dashboard() {
             const maxVal = Number(config[`${prefix}${action.id}Max` as keyof typeof config]);
             const key = config[`${prefix}${action.id}Key` as keyof typeof config] as string;
             const delay = Number(config[`${prefix}${action.id}Delay` as keyof typeof config]);
+            const leftKey = action.hasDirectional ? config[`${prefix}${action.id}LeftKey` as keyof typeof config] as string : "";
+            const rightKey = action.hasDirectional ? config[`${prefix}${action.id}RightKey` as keyof typeof config] as string : "";
             const quantity = signalType === 'buy' ? data.buyQuantity : data.sellQuantity;
             const isActive = config.isActive && quantity >= minVal && quantity <= maxVal;
             
@@ -253,6 +255,12 @@ export default function Dashboard() {
                     <div className="text-[8px] text-white/50">
                       {action.name} ({delay}s)
                     </div>
+                    {action.hasDirectional && (leftKey || rightKey) && (
+                      <div className="text-[7px] text-white/40 mt-1">
+                        {leftKey && <span className="mr-1">[{leftKey.toUpperCase()}]</span>}
+                        {rightKey && <span>[{rightKey.toUpperCase()}]</span>}
+                      </div>
+                    )}
                   </div>
                 </div>
                 {isActive && (
