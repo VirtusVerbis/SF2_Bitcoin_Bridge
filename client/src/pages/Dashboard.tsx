@@ -282,7 +282,7 @@ export default function Dashboard() {
             <Cpu className="text-white w-5 h-5" />
           </div>
           <div>
-            <h1 className="text-lg font-display font-bold tracking-tight">SF2 Bitcoin Bridge</h1>
+            <h1 className="text-lg font-display font-bold tracking-tight">SF2 Crypto Bridge</h1>
             <div className="flex items-center gap-2 text-[10px] font-mono text-muted-foreground">
               <span className="uppercase">P1: {config.symbol}</span>
               <span className="w-1 h-1 rounded-full bg-white/20" />
