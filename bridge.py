@@ -2,7 +2,7 @@
 """
 Crypto Quantity to MAME Keyboard Bridge - SF2 Edition
 Supports 12 buttons (6 per player) with range-based triggers.
-Now includes Special Move support with 3 command formats:
+Now includes 9 Special Moves per player with 3 command formats:
 - Rapid repeat: "xxxxx" (same key mashed)
 - Sequential: "x,y,c,u" (comma-separated keys)
 - Simultaneous: "x+y+c" (keys pressed together)
@@ -217,13 +217,13 @@ class CryptoMAMEBridge:
             self.press_key(tokens[0])
 
     def check_special_moves(self, quantity, exchange, signal_type):
-        """Check if quantity triggers any special moves for the given exchange and signal type"""
+        """Check if quantity triggers any special moves for the given exchange and signal type (1-9)"""
         if not self.config or not self.config.get('isActive'):
             return
 
         prefix = 'binance' if exchange == 'binance' else 'coinbase'
 
-        for i in range(1, 4):
+        for i in range(1, 10):
             special_signal = self.config.get(f"{prefix}Special{i}Signal", "buy")
             if special_signal != signal_type:
                 continue
