@@ -20,7 +20,7 @@ export function KeyIndicator({ label, active, type, min, max, currentValue }: Ke
   
   return (
     <div className={cn(
-      "relative flex flex-col items-center justify-center p-3 rounded-2xl border border-border/50 bg-card/50 backdrop-blur-sm overflow-hidden transition-all duration-300",
+      "relative flex flex-col items-center justify-center p-2 rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm overflow-hidden transition-all duration-300",
       active && isBuy && "border-[hsl(var(--color-buy))] shadow-[0_0_30px_-12px_hsl(var(--color-buy)/0.5)]",
       active && !isBuy && "border-[hsl(var(--color-sell))] shadow-[0_0_30px_-12px_hsl(var(--color-sell)/0.5)]"
     )}>
@@ -32,8 +32,8 @@ export function KeyIndicator({ label, active, type, min, max, currentValue }: Ke
         style={{ height: `${percentage}%` }}
       />
 
-      <div className="relative z-10 text-center space-y-1 w-full">
-        <div className="relative h-14 flex items-center justify-center">
+      <div className="relative z-10 text-center w-full">
+        <div className="relative h-10 flex items-center justify-center">
           <motion.div
             animate={{
               scale: active ? 1.1 : 1,
@@ -42,7 +42,7 @@ export function KeyIndicator({ label, active, type, min, max, currentValue }: Ke
                 : "0 0 0px transparent"
             }}
             className={cn(
-              "text-5xl font-display font-bold select-none transition-colors duration-100",
+              "text-4xl font-display font-bold select-none transition-colors duration-100",
               active 
                 ? (isBuy ? "text-[hsl(var(--color-buy))]" : "text-[hsl(var(--color-sell))]")
                 : "text-muted-foreground/20"
@@ -67,7 +67,7 @@ export function KeyIndicator({ label, active, type, min, max, currentValue }: Ke
           </AnimatePresence>
         </div>
 
-        <p className="font-mono text-xs text-muted-foreground">
+        <p className="font-mono text-[10px] text-muted-foreground">
           {Number(currentValue || 0).toFixed(8)}
         </p>
       </div>
