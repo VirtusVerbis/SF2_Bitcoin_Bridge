@@ -158,6 +158,26 @@ const DEFAULT_CONFIGURATION = {
   coinbaseMoveBackwardMax: 0.00009999,
   coinbaseMoveBackwardSignal: "sell" as const,
   coinbaseMoveBackwardKey: "p",
+  binanceJumpMin: 0.00001,
+  binanceJumpMax: 0.00009999,
+  binanceJumpSignal: "buy" as const,
+  binanceJumpKey: "w",
+  binanceJumpDelay: 5.0,
+  binanceCrouchMin: 0.00001,
+  binanceCrouchMax: 0.00009999,
+  binanceCrouchSignal: "sell" as const,
+  binanceCrouchKey: "e",
+  binanceCrouchDelay: 5.0,
+  coinbaseJumpMin: 0.00001,
+  coinbaseJumpMax: 0.00009999,
+  coinbaseJumpSignal: "buy" as const,
+  coinbaseJumpKey: "o",
+  coinbaseJumpDelay: 5.0,
+  coinbaseCrouchMin: 0.00001,
+  coinbaseCrouchMax: 0.00009999,
+  coinbaseCrouchSignal: "sell" as const,
+  coinbaseCrouchKey: "p",
+  coinbaseCrouchDelay: 5.0,
 };
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -278,6 +298,26 @@ const formSchema = insertConfigurationSchema.extend({
   coinbaseMoveBackwardMax: z.coerce.number().min(0),
   coinbaseMoveBackwardSignal: z.enum(["buy", "sell"]),
   coinbaseMoveBackwardKey: z.string().min(1),
+  binanceJumpMin: z.coerce.number().min(0),
+  binanceJumpMax: z.coerce.number().min(0),
+  binanceJumpSignal: z.enum(["buy", "sell"]),
+  binanceJumpKey: z.string().min(1),
+  binanceJumpDelay: z.coerce.number().min(0.1),
+  binanceCrouchMin: z.coerce.number().min(0),
+  binanceCrouchMax: z.coerce.number().min(0),
+  binanceCrouchSignal: z.enum(["buy", "sell"]),
+  binanceCrouchKey: z.string().min(1),
+  binanceCrouchDelay: z.coerce.number().min(0.1),
+  coinbaseJumpMin: z.coerce.number().min(0),
+  coinbaseJumpMax: z.coerce.number().min(0),
+  coinbaseJumpSignal: z.enum(["buy", "sell"]),
+  coinbaseJumpKey: z.string().min(1),
+  coinbaseJumpDelay: z.coerce.number().min(0.1),
+  coinbaseCrouchMin: z.coerce.number().min(0),
+  coinbaseCrouchMax: z.coerce.number().min(0),
+  coinbaseCrouchSignal: z.enum(["buy", "sell"]),
+  coinbaseCrouchKey: z.string().min(1),
+  coinbaseCrouchDelay: z.coerce.number().min(0.1),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -417,6 +457,26 @@ export function ConfigPanel({ config }: ConfigPanelProps) {
       coinbaseMoveBackwardMax: Number(config.coinbaseMoveBackwardMax),
       coinbaseMoveBackwardSignal: config.coinbaseMoveBackwardSignal,
       coinbaseMoveBackwardKey: config.coinbaseMoveBackwardKey,
+      binanceJumpMin: Number(config.binanceJumpMin),
+      binanceJumpMax: Number(config.binanceJumpMax),
+      binanceJumpSignal: config.binanceJumpSignal,
+      binanceJumpKey: config.binanceJumpKey,
+      binanceJumpDelay: Number(config.binanceJumpDelay),
+      binanceCrouchMin: Number(config.binanceCrouchMin),
+      binanceCrouchMax: Number(config.binanceCrouchMax),
+      binanceCrouchSignal: config.binanceCrouchSignal,
+      binanceCrouchKey: config.binanceCrouchKey,
+      binanceCrouchDelay: Number(config.binanceCrouchDelay),
+      coinbaseJumpMin: Number(config.coinbaseJumpMin),
+      coinbaseJumpMax: Number(config.coinbaseJumpMax),
+      coinbaseJumpSignal: config.coinbaseJumpSignal,
+      coinbaseJumpKey: config.coinbaseJumpKey,
+      coinbaseJumpDelay: Number(config.coinbaseJumpDelay),
+      coinbaseCrouchMin: Number(config.coinbaseCrouchMin),
+      coinbaseCrouchMax: Number(config.coinbaseCrouchMax),
+      coinbaseCrouchSignal: config.coinbaseCrouchSignal,
+      coinbaseCrouchKey: config.coinbaseCrouchKey,
+      coinbaseCrouchDelay: Number(config.coinbaseCrouchDelay),
     },
   });
 
@@ -536,6 +596,26 @@ export function ConfigPanel({ config }: ConfigPanelProps) {
         coinbaseMoveBackwardMax: Number(config.coinbaseMoveBackwardMax),
         coinbaseMoveBackwardSignal: config.coinbaseMoveBackwardSignal,
         coinbaseMoveBackwardKey: config.coinbaseMoveBackwardKey,
+        binanceJumpMin: Number(config.binanceJumpMin),
+        binanceJumpMax: Number(config.binanceJumpMax),
+        binanceJumpSignal: config.binanceJumpSignal,
+        binanceJumpKey: config.binanceJumpKey,
+        binanceJumpDelay: Number(config.binanceJumpDelay),
+        binanceCrouchMin: Number(config.binanceCrouchMin),
+        binanceCrouchMax: Number(config.binanceCrouchMax),
+        binanceCrouchSignal: config.binanceCrouchSignal,
+        binanceCrouchKey: config.binanceCrouchKey,
+        binanceCrouchDelay: Number(config.binanceCrouchDelay),
+        coinbaseJumpMin: Number(config.coinbaseJumpMin),
+        coinbaseJumpMax: Number(config.coinbaseJumpMax),
+        coinbaseJumpSignal: config.coinbaseJumpSignal,
+        coinbaseJumpKey: config.coinbaseJumpKey,
+        coinbaseJumpDelay: Number(config.coinbaseJumpDelay),
+        coinbaseCrouchMin: Number(config.coinbaseCrouchMin),
+        coinbaseCrouchMax: Number(config.coinbaseCrouchMax),
+        coinbaseCrouchSignal: config.coinbaseCrouchSignal,
+        coinbaseCrouchKey: config.coinbaseCrouchKey,
+        coinbaseCrouchDelay: Number(config.coinbaseCrouchDelay),
       } as any);
     }
   }, [config, form]);
@@ -783,6 +863,98 @@ export function ConfigPanel({ config }: ConfigPanelProps) {
     );
   };
 
+  const renderJumpCrouchFields = (prefix: string) => {
+    const actions = [
+      { id: "Jump", name: "Jump", color: "text-cyan-400" },
+      { id: "Crouch", name: "Crouch", color: "text-orange-400" },
+    ];
+
+    return (
+      <div className="space-y-4">
+        <h4 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground/70 flex items-center gap-2">
+          Jump / Crouch Controls
+        </h4>
+        {actions.map((action) => (
+          <div key={action.id} className="space-y-2 p-3 rounded-lg bg-gradient-to-r from-cyan-500/10 to-orange-500/10 border border-cyan-500/20">
+            <div className={`text-[10px] font-bold uppercase ${action.color} flex items-center gap-1`}>
+              {action.name}
+            </div>
+            <div className="grid grid-cols-12 gap-2 items-end">
+              <FormField
+                control={form.control}
+                name={`${prefix}${action.id}Min` as any}
+                render={({ field }) => (
+                  <FormItem className="col-span-3">
+                    <FormLabel className="text-[9px] uppercase font-bold text-muted-foreground/50">Min Qty</FormLabel>
+                    <FormControl>
+                      <Input type="number" step="0.000000001" {...field} className="h-8 text-[10px] font-mono px-1 bg-black/20" />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name={`${prefix}${action.id}Max` as any}
+                render={({ field }) => (
+                  <FormItem className="col-span-3">
+                    <FormLabel className="text-[9px] uppercase font-bold text-muted-foreground/50">Max Qty</FormLabel>
+                    <FormControl>
+                      <Input type="number" step="0.000000001" {...field} className="h-8 text-[10px] font-mono px-1 bg-black/20" />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name={`${prefix}${action.id}Signal` as any}
+                render={({ field }) => (
+                  <FormItem className="col-span-2">
+                    <FormLabel className="text-[9px] uppercase font-bold text-muted-foreground/50">Signal</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="h-8 text-[10px] bg-black/20">
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="buy">Buy</SelectItem>
+                        <SelectItem value="sell">Sell</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name={`${prefix}${action.id}Key` as any}
+                render={({ field }) => (
+                  <FormItem className="col-span-2">
+                    <FormLabel className="text-[9px] uppercase font-bold text-muted-foreground/50">Key</FormLabel>
+                    <FormControl>
+                      <Input {...field} maxLength={1} className="h-8 text-[10px] font-mono px-1 bg-black/20 text-center uppercase" />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name={`${prefix}${action.id}Delay` as any}
+                render={({ field }) => (
+                  <FormItem className="col-span-2">
+                    <FormLabel className="text-[9px] uppercase font-bold text-muted-foreground/50">Delay (s)</FormLabel>
+                    <FormControl>
+                      <Input type="number" step="0.1" min="0.1" {...field} className="h-8 text-[10px] font-mono px-1 bg-black/20 text-center" />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -848,6 +1020,7 @@ export function ConfigPanel({ config }: ConfigPanelProps) {
                     </div>
                     {renderSpecialMoveFields("binance")}
                     {renderMovementFields("binance")}
+                    {renderJumpCrouchFields("binance")}
                   </TabsContent>
 
                   <TabsContent value="coinbase" className="space-y-6 pt-4">
@@ -870,6 +1043,7 @@ export function ConfigPanel({ config }: ConfigPanelProps) {
                     </div>
                     {renderSpecialMoveFields("coinbase")}
                     {renderMovementFields("coinbase")}
+                    {renderJumpCrouchFields("coinbase")}
                   </TabsContent>
                 </Tabs>
               </div>

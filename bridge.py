@@ -41,6 +41,19 @@ class CryptoMAMEBridge:
         self.press_cooldown = 0.2
         self.special_cooldowns = {}
         self.special_cooldown_time = 0.5
+        # Jump/Crouch state tracking - last trigger time for periodic key presses
+        self.jump_crouch_last_trigger = {
+            'binanceJump': 0,
+            'binanceCrouch': 0,
+            'coinbaseJump': 0,
+            'coinbaseCrouch': 0,
+        }
+        self.jump_crouch_active = {
+            'binanceJump': False,
+            'binanceCrouch': False,
+            'coinbaseJump': False,
+            'coinbaseCrouch': False,
+        }
 
     def fetch_config(self):
         try:
@@ -257,6 +270,44 @@ class CryptoMAMEBridge:
                 logger.info(f"MOVing {movement} ({prefix}) with key {key} (Qty: {quantity})")
                 self.press_key(key,0.5)
 
+    def check_jump_crouch_controls(self, quantity, exchange, signal_type):
+        """Check if quantity triggers jump/crouch controls with periodic key pressing based on delay.
+        
+        Jump/Crouch work differently from other controls - they trigger periodic key presses
+        based on a configurable delay (in seconds). When quantity is in range, the key will
+        be pressed once every 'delay' seconds.
+        """
+        if not self.config or not self.config.get('isActive'):
+            return
+
+        prefix = 'binance' if exchange == 'binance' else 'coinbase'
+        now = time.time()
+
+        actions = ['Jump', 'Crouch']
+        for action in actions:
+            action_signal = self.config.get(f"{prefix}{action}Signal", "buy")
+            if action_signal != signal_type:
+                self.jump_crouch_active[f"{prefix}{action}"] = False
+                continue
+
+            min_val = float(self.config.get(f"{prefix}{action}Min", 0))
+            max_val = float(self.config.get(f"{prefix}{action}Max", 0))
+            key = self.config.get(f"{prefix}{action}Key", "")
+            delay = float(self.config.get(f"{prefix}{action}Delay", 5.0))
+
+            if min_val <= quantity <= max_val and key:
+                action_key = f"{prefix}{action}"
+                self.jump_crouch_active[action_key] = True
+                
+                # Check if enough time has passed since last trigger
+                last_trigger = self.jump_crouch_last_trigger.get(action_key, 0)
+                if now - last_trigger >= delay:
+                    logger.info(f"Triggering {action} ({prefix}) with key {key} (Qty: {quantity}, Delay: {delay}s)")
+                    self.press_key(key, 0.15)
+                    self.jump_crouch_last_trigger[action_key] = now
+            else:
+                self.jump_crouch_active[f"{prefix}{action}"] = False
+
     def on_binance_message(self, ws, message):
         try:
             data = json.loads(message)
@@ -268,10 +319,12 @@ class CryptoMAMEBridge:
                 self.check_range_and_press(quantity, 'binanceBuy')
                 self.check_special_moves(quantity, 'binance', 'buy')
                 self.check_movement_controls(quantity, 'binance', 'buy')
+                self.check_jump_crouch_controls(quantity, 'binance', 'buy')
             else: # Sell
                 self.check_range_and_press(quantity, 'binanceSell')
                 self.check_special_moves(quantity, 'binance', 'sell')
                 self.check_movement_controls(quantity, 'binance', 'sell')
+                self.check_jump_crouch_controls(quantity, 'binance', 'sell')
         except Exception as e:
             logger.error(f"Binance error: {e}")
 
@@ -288,10 +341,12 @@ class CryptoMAMEBridge:
                 self.check_range_and_press(quantity, 'coinbaseBuy')
                 self.check_special_moves(quantity, 'coinbase', 'buy')
                 self.check_movement_controls(quantity, 'coinbase', 'buy')
+                self.check_jump_crouch_controls(quantity, 'coinbase', 'buy')
             elif side == 'sell':
                 self.check_range_and_press(quantity, 'coinbaseSell')
                 self.check_special_moves(quantity, 'coinbase', 'sell')
                 self.check_movement_controls(quantity, 'coinbase', 'sell')
+                self.check_jump_crouch_controls(quantity, 'coinbase', 'sell')
         except Exception as e:
             logger.error(f"Coinbase error: {e}")
 

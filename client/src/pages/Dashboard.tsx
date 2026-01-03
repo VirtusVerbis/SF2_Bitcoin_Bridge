@@ -209,6 +209,63 @@ export default function Dashboard() {
     );
   };
 
+  const renderJumpCrouchControls = (
+    player: string,
+    data: any,
+    prefix: "binance" | "coinbase"
+  ) => {
+    const actions = [
+      { id: "Jump", name: "JMP", color: "from-cyan-500 to-cyan-700" },
+      { id: "Crouch", name: "CRC", color: "from-orange-500 to-orange-700" },
+    ];
+
+    return (
+      <div className="space-y-3">
+        <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 flex items-center gap-1">
+          {player} Jump/Crouch
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          {actions.map((action) => {
+            const signalType = config[`${prefix}${action.id}Signal` as keyof typeof config] as string;
+            const minVal = Number(config[`${prefix}${action.id}Min` as keyof typeof config]);
+            const maxVal = Number(config[`${prefix}${action.id}Max` as keyof typeof config]);
+            const key = config[`${prefix}${action.id}Key` as keyof typeof config] as string;
+            const delay = Number(config[`${prefix}${action.id}Delay` as keyof typeof config]);
+            const quantity = signalType === 'buy' ? data.buyQuantity : data.sellQuantity;
+            const isActive = config.isActive && quantity >= minVal && quantity <= maxVal;
+            
+            return (
+              <div 
+                key={action.id}
+                data-testid={`jump-crouch-indicator-${prefix}-${action.id}`}
+                className={cn(
+                  "relative rounded-lg p-3 border transition-all duration-150 overflow-hidden",
+                  isActive 
+                    ? `bg-gradient-to-br ${action.color} border-white/30 shadow-lg animate-pulse` 
+                    : "bg-black/20 border-white/5"
+                )}
+              >
+                <div className="flex items-center justify-center gap-2">
+                  <div className="text-center">
+                    <div className={cn("text-lg font-bold uppercase", isActive ? "text-white" : "text-white/30")}>
+                      {key || "?"}
+                    </div>
+                    <div className="text-[8px] text-white/50">
+                      {action.name} ({delay}s)
+                    </div>
+                  </div>
+                </div>
+                {isActive && (
+                  <div className="absolute inset-0 bg-white/10 animate-ping pointer-events-none" />
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary/30 p-4 md:p-6 flex flex-col gap-4">
       <header className="flex flex-col md:flex-row items-center justify-between gap-4 bg-card/30 backdrop-blur-md border border-white/5 p-4 rounded-2xl">
@@ -304,6 +361,7 @@ export default function Dashboard() {
               {renderPlayerControls("P1", binanceData, "binanceSell")}
               {renderSpecialMoves("P1", binanceData, "binance")}
               {renderMovementControls("P1", binanceData, "binance")}
+              {renderJumpCrouchControls("P1", binanceData, "binance")}
             </div>
           </div>
           
@@ -314,6 +372,7 @@ export default function Dashboard() {
               {renderPlayerControls("P2", coinbaseData, "coinbaseSell")}
               {renderSpecialMoves("P2", coinbaseData, "coinbase")}
               {renderMovementControls("P2", coinbaseData, "coinbase")}
+              {renderJumpCrouchControls("P2", coinbaseData, "coinbase")}
             </div>
           </div>
         </div>
