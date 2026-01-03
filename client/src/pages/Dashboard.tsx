@@ -181,19 +181,19 @@ export default function Dashboard() {
                 key={move.id}
                 data-testid={`movement-indicator-${prefix}-${move.id}`}
                 className={cn(
-                  "relative rounded-lg p-3 border transition-all duration-150 overflow-hidden",
+                  "relative rounded-md p-2 border transition-all duration-150 overflow-hidden",
                   isActive 
                     ? `bg-gradient-to-br ${move.color} border-white/30 shadow-lg animate-pulse` 
                     : "bg-black/20 border-white/5"
                 )}
               >
-                <div className="flex items-center justify-center gap-2">
-                  <IconComponent className={cn("w-5 h-5", isActive ? "text-white" : "text-white/30")} />
+                <div className="flex items-center justify-center gap-1">
+                  <IconComponent className={cn("w-4 h-4", isActive ? "text-white" : "text-white/30")} />
                   <div className="text-center">
-                    <div className={cn("text-lg font-bold uppercase", isActive ? "text-white" : "text-white/30")}>
+                    <div className={cn("text-base font-bold uppercase", isActive ? "text-white" : "text-white/30")}>
                       {key || "?"}
                     </div>
-                    <div className="text-[8px] text-white/50">
+                    <div className="text-[7px] text-white/50">
                       {move.name}
                     </div>
                   </div>
@@ -241,22 +241,22 @@ export default function Dashboard() {
                 key={action.id}
                 data-testid={`jump-crouch-indicator-${prefix}-${action.id}`}
                 className={cn(
-                  "relative rounded-lg p-3 border transition-all duration-150 overflow-hidden",
+                  "relative rounded-md p-2 border transition-all duration-150 overflow-hidden",
                   isActive 
                     ? `bg-gradient-to-br ${action.color} border-white/30 shadow-lg animate-pulse` 
                     : "bg-black/20 border-white/5"
                 )}
               >
-                <div className="flex items-center justify-center gap-2">
+                <div className="flex items-center justify-center gap-1">
                   <div className="text-center">
-                    <div className={cn("text-lg font-bold uppercase", isActive ? "text-white" : "text-white/30")}>
+                    <div className={cn("text-base font-bold uppercase", isActive ? "text-white" : "text-white/30")}>
                       {key || "?"}
                     </div>
-                    <div className="text-[8px] text-white/50">
+                    <div className="text-[7px] text-white/50">
                       {action.name} ({delay}s)
                     </div>
                     {action.hasDirectional && (leftKey || rightKey) && (
-                      <div className="text-[7px] text-white/40 mt-1">
+                      <div className="text-[6px] text-white/40 mt-0.5">
                         {leftKey && <span className="mr-1">[{leftKey.toUpperCase()}]</span>}
                         {rightKey && <span>[{rightKey.toUpperCase()}]</span>}
                       </div>
