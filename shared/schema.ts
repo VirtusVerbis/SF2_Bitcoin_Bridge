@@ -173,6 +173,32 @@ export const configurations = pgTable("configurations", {
   coinbaseMoveBackwardMax: numeric("coinbase_move_backward_max", { precision: 18, scale: 8 }).notNull().default("0.00009999"),
   coinbaseMoveBackwardSignal: text("coinbase_move_backward_signal").notNull().default("sell"),
   coinbaseMoveBackwardKey: text("coinbase_move_backward_key").notNull().default("k"),
+
+  // Binance Jump/Crouch (P1)
+  binanceJumpMin: numeric("binance_jump_min", { precision: 18, scale: 8 }).notNull().default("0.00001000"),
+  binanceJumpMax: numeric("binance_jump_max", { precision: 18, scale: 8 }).notNull().default("0.00009999"),
+  binanceJumpSignal: text("binance_jump_signal").notNull().default("buy"),
+  binanceJumpKey: text("binance_jump_key").notNull().default("w"),
+  binanceJumpDelay: numeric("binance_jump_delay", { precision: 10, scale: 2 }).notNull().default("5.00"),
+
+  binanceCrouchMin: numeric("binance_crouch_min", { precision: 18, scale: 8 }).notNull().default("0.00001000"),
+  binanceCrouchMax: numeric("binance_crouch_max", { precision: 18, scale: 8 }).notNull().default("0.00009999"),
+  binanceCrouchSignal: text("binance_crouch_signal").notNull().default("sell"),
+  binanceCrouchKey: text("binance_crouch_key").notNull().default("e"),
+  binanceCrouchDelay: numeric("binance_crouch_delay", { precision: 10, scale: 2 }).notNull().default("5.00"),
+
+  // Coinbase Jump/Crouch (P2)
+  coinbaseJumpMin: numeric("coinbase_jump_min", { precision: 18, scale: 8 }).notNull().default("0.00001000"),
+  coinbaseJumpMax: numeric("coinbase_jump_max", { precision: 18, scale: 8 }).notNull().default("0.00009999"),
+  coinbaseJumpSignal: text("coinbase_jump_signal").notNull().default("buy"),
+  coinbaseJumpKey: text("coinbase_jump_key").notNull().default("o"),
+  coinbaseJumpDelay: numeric("coinbase_jump_delay", { precision: 10, scale: 2 }).notNull().default("5.00"),
+
+  coinbaseCrouchMin: numeric("coinbase_crouch_min", { precision: 18, scale: 8 }).notNull().default("0.00001000"),
+  coinbaseCrouchMax: numeric("coinbase_crouch_max", { precision: 18, scale: 8 }).notNull().default("0.00009999"),
+  coinbaseCrouchSignal: text("coinbase_crouch_signal").notNull().default("sell"),
+  coinbaseCrouchKey: text("coinbase_crouch_key").notNull().default("p"),
+  coinbaseCrouchDelay: numeric("coinbase_crouch_delay", { precision: 10, scale: 2 }).notNull().default("5.00"),
 });
 
 const numericField = z.union([z.string(), z.number()]).pipe(z.coerce.string());
@@ -246,6 +272,18 @@ export const insertConfigurationSchema = createInsertSchema(configurations).omit
   coinbaseMoveForwardMax: numericField,
   coinbaseMoveBackwardMin: numericField,
   coinbaseMoveBackwardMax: numericField,
+  binanceJumpMin: numericField,
+  binanceJumpMax: numericField,
+  binanceJumpDelay: numericField,
+  binanceCrouchMin: numericField,
+  binanceCrouchMax: numericField,
+  binanceCrouchDelay: numericField,
+  coinbaseJumpMin: numericField,
+  coinbaseJumpMax: numericField,
+  coinbaseJumpDelay: numericField,
+  coinbaseCrouchMin: numericField,
+  coinbaseCrouchMax: numericField,
+  coinbaseCrouchDelay: numericField,
 });
 
 export type Configuration = typeof configurations.$inferSelect;
