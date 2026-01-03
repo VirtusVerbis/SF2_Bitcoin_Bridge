@@ -179,6 +179,8 @@ export const configurations = pgTable("configurations", {
   binanceJumpMax: numeric("binance_jump_max", { precision: 18, scale: 8 }).notNull().default("0.00009999"),
   binanceJumpSignal: text("binance_jump_signal").notNull().default("buy"),
   binanceJumpKey: text("binance_jump_key").notNull().default("w"),
+  binanceJumpLeftKey: text("binance_jump_left_key").notNull().default("f"),
+  binanceJumpRightKey: text("binance_jump_right_key").notNull().default("h"),
   binanceJumpDelay: numeric("binance_jump_delay", { precision: 10, scale: 2 }).notNull().default("5.00"),
 
   binanceCrouchMin: numeric("binance_crouch_min", { precision: 18, scale: 8 }).notNull().default("0.00001000"),
@@ -192,6 +194,8 @@ export const configurations = pgTable("configurations", {
   coinbaseJumpMax: numeric("coinbase_jump_max", { precision: 18, scale: 8 }).notNull().default("0.00009999"),
   coinbaseJumpSignal: text("coinbase_jump_signal").notNull().default("buy"),
   coinbaseJumpKey: text("coinbase_jump_key").notNull().default("o"),
+  coinbaseJumpLeftKey: text("coinbase_jump_left_key").notNull().default("p"),
+  coinbaseJumpRightKey: text("coinbase_jump_right_key").notNull().default("k"),
   coinbaseJumpDelay: numeric("coinbase_jump_delay", { precision: 10, scale: 2 }).notNull().default("5.00"),
 
   coinbaseCrouchMin: numeric("coinbase_crouch_min", { precision: 18, scale: 8 }).notNull().default("0.00001000"),

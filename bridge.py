@@ -13,6 +13,7 @@ import time
 import requests
 import logging
 import threading
+import random
 from enum import Enum
 from pynput.keyboard import Controller
 
@@ -89,6 +90,18 @@ class CryptoMAMEBridge:
             self.keyboard.press(key_char)
             time.sleep(duration)
             self.keyboard.release(key_char)
+        except Exception as e:
+            logger.error(f"Error pressing key '{key_char}': {e}")
+
+    def press_key_hold(self, key_char, duration=0.1):
+        try:
+            key_char = key_char.lower().strip()
+            if key_char not in ALLOWED_KEYS:
+                logger.warning(f"Key '{key_char}' not in allowed keys, skipping")
+                return
+            self.keyboard.press(key_char)
+            time.sleep(duration)
+            # self.keyboard.release(key_char)  # don't release - hold it
         except Exception as e:
             logger.error(f"Error pressing key '{key_char}': {e}")
 
@@ -270,12 +283,45 @@ class CryptoMAMEBridge:
                 logger.info(f"MOVing {movement} ({prefix}) with key {key} (Qty: {quantity})")
                 self.press_key(key,0.5)
 
+    def execute_directional_jump(self, jump_key, direction_key):
+        """Execute a directional jump: press direction, then jump, then release both.
+        
+        This creates a rolling overlap for diagonal jumps in fighting games.
+        """
+        try:
+            direction_key = direction_key.lower().strip()
+            jump_key = jump_key.lower().strip()
+            
+            if direction_key not in ALLOWED_KEYS or jump_key not in ALLOWED_KEYS:
+                logger.warning(f"Invalid keys for directional jump: dir={direction_key}, jump={jump_key}")
+                return
+            
+            # Press direction first
+            self.keyboard.press(direction_key)
+            time.sleep(0.05)  # Small overlap delay
+            
+            # Press jump while holding direction
+            self.keyboard.press(jump_key)
+            time.sleep(0.15)  # Hold both keys
+            
+            # Release both keys
+            self.keyboard.release(jump_key)
+            self.keyboard.release(direction_key)
+            
+        except Exception as e:
+            logger.error(f"Error executing directional jump: {e}")
+
     def check_jump_crouch_controls(self, quantity, exchange, signal_type):
         """Check if quantity triggers jump/crouch controls with periodic key pressing based on delay.
-        
+
         Jump/Crouch work differently from other controls - they trigger periodic key presses
         based on a configurable delay (in seconds). When quantity is in range, the key will
         be pressed once every 'delay' seconds.
+        
+        For Jump, randomly selects between:
+        - Left + Jump (directional jump left)
+        - Right + Jump (directional jump right)
+        - Neutral Jump (jump key only)
         """
         if not self.config or not self.config.get('isActive'):
             return
@@ -298,12 +344,39 @@ class CryptoMAMEBridge:
             if min_val <= quantity <= max_val and key:
                 action_key = f"{prefix}{action}"
                 self.jump_crouch_active[action_key] = True
-                
+
                 # Check if enough time has passed since last trigger
                 last_trigger = self.jump_crouch_last_trigger.get(action_key, 0)
                 if now - last_trigger >= delay:
-                    logger.info(f"Triggering {action} ({prefix}) with key {key} (Qty: {quantity}, Delay: {delay}s)")
-                    self.press_key(key, 0.15)
+                    if action == 'Jump':
+                        # Get directional keys for Jump
+                        left_key = self.config.get(f"{prefix}JumpLeftKey", "")
+                        right_key = self.config.get(f"{prefix}JumpRightKey", "")
+                        
+                        # Build list of available jump options
+                        jump_options = ['neutral']  # Always have neutral jump
+                        if left_key and left_key.strip():
+                            jump_options.append('left')
+                        if right_key and right_key.strip():
+                            jump_options.append('right')
+                        
+                        # Randomly select jump type
+                        jump_type = random.choice(jump_options)
+                        
+                        if jump_type == 'left':
+                            logger.info(f"Triggering Left Jump ({prefix}) with keys {left_key}+{key} (Qty: {quantity}, Delay: {delay}s)")
+                            self.execute_directional_jump(key, left_key)
+                        elif jump_type == 'right':
+                            logger.info(f"Triggering Right Jump ({prefix}) with keys {right_key}+{key} (Qty: {quantity}, Delay: {delay}s)")
+                            self.execute_directional_jump(key, right_key)
+                        else:
+                            logger.info(f"Triggering Neutral Jump ({prefix}) with key {key} (Qty: {quantity}, Delay: {delay}s)")
+                            self.press_key(key, 0.15)
+                    else:
+                        # Crouch behavior unchanged
+                        logger.info(f"Triggering {action} ({prefix}) with key {key} (Qty: {quantity}, Delay: {delay}s)")
+                        self.press_key_hold(key, 1.75)
+
                     self.jump_crouch_last_trigger[action_key] = now
             else:
                 self.jump_crouch_active[f"{prefix}{action}"] = False

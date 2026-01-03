@@ -162,6 +162,8 @@ const DEFAULT_CONFIGURATION = {
   binanceJumpMax: 0.00009999,
   binanceJumpSignal: "buy" as const,
   binanceJumpKey: "w",
+  binanceJumpLeftKey: "f",
+  binanceJumpRightKey: "h",
   binanceJumpDelay: 5.0,
   binanceCrouchMin: 0.00001,
   binanceCrouchMax: 0.00009999,
@@ -172,6 +174,8 @@ const DEFAULT_CONFIGURATION = {
   coinbaseJumpMax: 0.00009999,
   coinbaseJumpSignal: "buy" as const,
   coinbaseJumpKey: "o",
+  coinbaseJumpLeftKey: "p",
+  coinbaseJumpRightKey: "k",
   coinbaseJumpDelay: 5.0,
   coinbaseCrouchMin: 0.00001,
   coinbaseCrouchMax: 0.00009999,
@@ -302,6 +306,8 @@ const formSchema = insertConfigurationSchema.extend({
   binanceJumpMax: z.coerce.number().min(0),
   binanceJumpSignal: z.enum(["buy", "sell"]),
   binanceJumpKey: z.string().min(1),
+  binanceJumpLeftKey: z.string(),
+  binanceJumpRightKey: z.string(),
   binanceJumpDelay: z.coerce.number().min(0.1),
   binanceCrouchMin: z.coerce.number().min(0),
   binanceCrouchMax: z.coerce.number().min(0),
@@ -312,6 +318,8 @@ const formSchema = insertConfigurationSchema.extend({
   coinbaseJumpMax: z.coerce.number().min(0),
   coinbaseJumpSignal: z.enum(["buy", "sell"]),
   coinbaseJumpKey: z.string().min(1),
+  coinbaseJumpLeftKey: z.string(),
+  coinbaseJumpRightKey: z.string(),
   coinbaseJumpDelay: z.coerce.number().min(0.1),
   coinbaseCrouchMin: z.coerce.number().min(0),
   coinbaseCrouchMax: z.coerce.number().min(0),
@@ -461,6 +469,8 @@ export function ConfigPanel({ config }: ConfigPanelProps) {
       binanceJumpMax: Number(config.binanceJumpMax),
       binanceJumpSignal: config.binanceJumpSignal,
       binanceJumpKey: config.binanceJumpKey,
+      binanceJumpLeftKey: config.binanceJumpLeftKey,
+      binanceJumpRightKey: config.binanceJumpRightKey,
       binanceJumpDelay: Number(config.binanceJumpDelay),
       binanceCrouchMin: Number(config.binanceCrouchMin),
       binanceCrouchMax: Number(config.binanceCrouchMax),
@@ -471,6 +481,8 @@ export function ConfigPanel({ config }: ConfigPanelProps) {
       coinbaseJumpMax: Number(config.coinbaseJumpMax),
       coinbaseJumpSignal: config.coinbaseJumpSignal,
       coinbaseJumpKey: config.coinbaseJumpKey,
+      coinbaseJumpLeftKey: config.coinbaseJumpLeftKey,
+      coinbaseJumpRightKey: config.coinbaseJumpRightKey,
       coinbaseJumpDelay: Number(config.coinbaseJumpDelay),
       coinbaseCrouchMin: Number(config.coinbaseCrouchMin),
       coinbaseCrouchMax: Number(config.coinbaseCrouchMax),
@@ -600,6 +612,8 @@ export function ConfigPanel({ config }: ConfigPanelProps) {
         binanceJumpMax: Number(config.binanceJumpMax),
         binanceJumpSignal: config.binanceJumpSignal,
         binanceJumpKey: config.binanceJumpKey,
+        binanceJumpLeftKey: config.binanceJumpLeftKey,
+        binanceJumpRightKey: config.binanceJumpRightKey,
         binanceJumpDelay: Number(config.binanceJumpDelay),
         binanceCrouchMin: Number(config.binanceCrouchMin),
         binanceCrouchMax: Number(config.binanceCrouchMax),
@@ -610,6 +624,8 @@ export function ConfigPanel({ config }: ConfigPanelProps) {
         coinbaseJumpMax: Number(config.coinbaseJumpMax),
         coinbaseJumpSignal: config.coinbaseJumpSignal,
         coinbaseJumpKey: config.coinbaseJumpKey,
+        coinbaseJumpLeftKey: config.coinbaseJumpLeftKey,
+        coinbaseJumpRightKey: config.coinbaseJumpRightKey,
         coinbaseJumpDelay: Number(config.coinbaseJumpDelay),
         coinbaseCrouchMin: Number(config.coinbaseCrouchMin),
         coinbaseCrouchMax: Number(config.coinbaseCrouchMax),
@@ -865,8 +881,8 @@ export function ConfigPanel({ config }: ConfigPanelProps) {
 
   const renderJumpCrouchFields = (prefix: string) => {
     const actions = [
-      { id: "Jump", name: "Jump", color: "text-cyan-400" },
-      { id: "Crouch", name: "Crouch", color: "text-orange-400" },
+      { id: "Jump", name: "Jump", color: "text-cyan-400", hasDirectional: true },
+      { id: "Crouch", name: "Crouch", color: "text-orange-400", hasDirectional: false },
     ];
 
     return (
@@ -949,6 +965,37 @@ export function ConfigPanel({ config }: ConfigPanelProps) {
                 )}
               />
             </div>
+            {action.hasDirectional && (
+              <div className="grid grid-cols-12 gap-2 items-end mt-2">
+                <div className="col-span-6 text-[9px] uppercase font-bold text-muted-foreground/50">
+                  Directional Jump Keys (random selection)
+                </div>
+                <FormField
+                  control={form.control}
+                  name={`${prefix}${action.id}LeftKey` as any}
+                  render={({ field }) => (
+                    <FormItem className="col-span-3">
+                      <FormLabel className="text-[9px] uppercase font-bold text-muted-foreground/50">Left Key</FormLabel>
+                      <FormControl>
+                        <Input {...field} maxLength={1} className="h-8 text-[10px] font-mono px-1 bg-black/20 text-center uppercase" placeholder="Optional" />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name={`${prefix}${action.id}RightKey` as any}
+                  render={({ field }) => (
+                    <FormItem className="col-span-3">
+                      <FormLabel className="text-[9px] uppercase font-bold text-muted-foreground/50">Right Key</FormLabel>
+                      <FormControl>
+                        <Input {...field} maxLength={1} className="h-8 text-[10px] font-mono px-1 bg-black/20 text-center uppercase" placeholder="Optional" />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              </div>
+            )}
           </div>
         ))}
       </div>
