@@ -10,7 +10,7 @@ Using OpenBOR Version: OpenBOR v4.0 Build 7556
 
 A meme game to showcase all the things I learned while I took the OpenBOR journey in 2D brawler-style mod creation.
 
-<a href="https://www.youtube.com/watch?v=NpQ0VG9puxE" target="_blank"><img src="https://github.com/VirtusVerbis/ProjectSaylor_BitcoinsOfRage/blob/main/readme_src/ProjSaylor_youtube.png" 
+<a href="https://www.youtube.com/watch?v=NpQ0VG9puxE" target="_blank"><img src="https://github.com/VirtusVerbis/SF2_Bitcoin_Bridge/blob/main/readme_src/YouTube_Thumb1.png" 
 alt="Click to watch trailer" width="400" height="240" border="10" /></a>
 
 
