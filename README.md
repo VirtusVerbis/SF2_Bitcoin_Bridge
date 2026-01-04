@@ -1,8 +1,9 @@
 
-# ![alt text](https://github.com/VirtusVerbis/SF2_Bitcoin_Bridge/tree/main/readme_src/Sample_Run.png "Sample Run") 
+# 
 
 # SF2 Bitcoin Bridge
 
+![alt text](https://github.com/VirtusVerbis/SF2_Bitcoin_Bridge/tree/main/readme_src/Sample_Run.png "Sample Run") 
 
 https://github.com/VirtusVerbis/SF2_Bitcoin_Bridge/tree/main/readme_src/Sample_Run.png
 
