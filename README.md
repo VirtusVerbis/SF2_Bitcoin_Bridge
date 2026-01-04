@@ -28,6 +28,12 @@ alt="Click to watch trailer" width="400" height="240" border="10" /></a>
 
 Replit hosting vs Local hosting - to be updated.
 
+How to Run it - to be updated.
+
+How to configure buttons - to be updated.
+
+
+
 
 
 ## Credits
