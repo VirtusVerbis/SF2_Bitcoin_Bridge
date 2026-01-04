@@ -35,7 +35,9 @@ Replit hosting vs Local hosting - to be updated.
 Credits go to:
 
 Replit.com (AI Coding).
+
 MAME is an open-source arcade emulator (https://www.mamedev.org/).
+
 Capcom owns the rights to SF2 (Street Fighter 2).
 
 
