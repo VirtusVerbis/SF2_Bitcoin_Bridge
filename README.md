@@ -1,7 +1,7 @@
 
 # SF2 Bitcoin Exchange to MAME Bridge
 
-# Context
+## Context
 
 ![alt text](https://github.com/VirtusVerbis/SF2_Bitcoin_Bridge/blob/main/readme_src/Sample_Run.png "Sample Run") 
 
@@ -24,7 +24,7 @@ Here's an early video of the initial creation:
 alt="Click to watch trailer" width="400" height="240" border="10" /></a>
 
 
-# Instructions
+## Instructions
 
 Replit hosting vs Local hosting - to be updated.
 
