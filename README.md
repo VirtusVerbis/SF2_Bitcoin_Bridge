@@ -5,11 +5,11 @@
 
 The objective was to create a Bitcoin price action visualizer but instead of looking at a boring chart, I wanted to see the action carried out on Street Fighter 2 via the MAME Emulator.  
 
-The program takes as input the BTC transaction data (specifically quantities of BTC being bought and sold) on Binance and Coinbase - they both have public APIs that provide such info.  Binance input goes towards Player 1 and Coinbase input towards Player 2.
+The program takes as input the BTC transaction data (specifically quantities of BTC being bought and sold) on Binance and Coinbase - they both have public APIs that provide such info.   Binance input goes towards Player 1 and Coinbase input towards Player 2.
 
 For each Player, all 6 punch and kick buttons are represented, 9 potential combos (definable), Forward + Backwards movements, Jump + Crouch.
 
-Since the program isn't really playing the game, if P1 and P2 switch positions (one jumps over the other) the inputs for combos no longer work (since the combo pattern corresponds to the players facing direction) - that is until P1 and P2 regain their original positions.
+Since the program isn't really playing the game, if P1 and P2 switch positions (one jumps over the other) the inputs for combos no longer work (since the combo pattern corresponds to the player's facing direction) - that is until P1 and P2 regain their original positions.
 
 The program was largely (99%) created by Replit AI (www.replit.com) over span of ~4 days (6-8 hours total effort).  If it wasn't for AI, I would not be able to piece this together so quickly, or even at all.
 
