@@ -38,7 +38,7 @@ Replit hosting vs Local hosting - to be updated.
 
 ## Bitcoin
 
-Bitcoin has existed since January 3rd, 2009 (~16 years now) and still hasn't gone to zero. There's a lot to be said about Bitcoin and there is a plethora of info that can be found on the net (ie: YouTube, Spotify, Twitter/X).
+Bitcoin has existed since January 3rd, 2009 (~17 years now) and still hasn't gone to zero. There's a lot to be said about Bitcoin and there is a plethora of info that can be found on the net (ie: YouTube, Spotify, Twitter/X).
 
 For any folks interested in understanding it better, here are some introductory documentaries/movies (free):
 
