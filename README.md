@@ -11,9 +11,9 @@ For each Player, all 6 punch and kick buttons are represented, 9 potential combo
 
 Since the program isn't really playing the game, if P1 and P2 switch positions (one jumps over the other) the inputs for combos no longer work (since the combo pattern corresponds to the player's facing direction) - that is until P1 and P2 regain their original positions.
 
-The program was largely (99%) created by Replit AI (www.replit.com) over span of ~4 days (6-8 hours total effort).  If it wasn't for AI, I would not be able to piece this together so quickly, or even at all.
+The program was largely (99%) created by Replit AI (www.replit.com) over a span of ~4 days (6-8 hours of my own effort largely spent on re-iterative design and play testing, AI effort was probably less than 30 mins).  If it wasn't for AI, I would not be able to piece this together so quickly, or even at all.
 
-The program isn't limited to SF2 as any game that fits a 1-vs-1 format would work (ie: Mortal Kombat, King of Fighters, etc.) - though this is not tested but the concept is similar (sending key presses to MAME that are pre-defined in the 'Settings' menu of the Web Dashboard).  
+The program isn't limited to SF2 as any game that fits a 1-vs-1 format would work (ie: Mortal Kombat, King of Fighters, etc.) - though this is not tested but the concept is similar (sending key presses to MAME that are user-defined in the 'Settings' menu of the Web Dashboard).  
 
 
 Here's an early video of the initial creation:
