@@ -1,14 +1,22 @@
 
-# SF2 Bitcoin Bridge
+# SF2 Bitcoin Exchange to MAME Bridge
 
 ![alt text](https://github.com/VirtusVerbis/SF2_Bitcoin_Bridge/blob/main/readme_src/Sample_Run.png "Sample Run") 
 
+The objective was to create a Bitcoin price action visualizer but instead of looking at a boring chart, I wanted to see the action carried out on Street Fighter 2 via the MAME Emulator.  
+
+The program takes as input the BTC transaction data (specifically quantities of BTC being bought and sold) on Binance and Coinbase - they both have public APIs that provide such info.  Binance input goes towards Player 1 and Coinbase input towards Player 2.
+
+For each Player, all 6 punch and kick buttons are represented, 9 potential combos (definable), Forward + Backwards movements, Jump + Crouch.
+
+Since the program isn't really playing the game, if P1 and P2 switch positions (one jumps over the other) the inputs for combos no longer work (since the combo pattern corresponds to the players facing direction) - that is until P1 and P2 regain their original positions.
+
+The program was largely (99%) created by Replit AI (www.replit.com) over span of ~4 days (6-8 hours total effort).  If it wasn't for AI, I would not be able to piece this together so quickly, or even at all.
+
+The program isn't limited to SF2 as any game that fits a 1-vs-1 format would work (ie: Mortal Kombat, King of Fighters, etc.) - though this is not tested but the concept is similar (sending key presses to MAME that are pre-defined in the 'Settings' menu of the Web Dashboard).  
 
 
-
-Using OpenBOR Version: OpenBOR v4.0 Build 7556
-
-A meme game to showcase all the things I learned while I took the OpenBOR journey in 2D brawler-style mod creation.
+Here's an early video of the initial creation:
 
 <a href="https://www.youtube.com/watch?v=NpQ0VG9puxE" target="_blank"><img src="https://github.com/VirtusVerbis/SF2_Bitcoin_Bridge/blob/main/readme_src/YouTube_Thumb1.png" 
 alt="Click to watch trailer" width="400" height="240" border="10" /></a>
