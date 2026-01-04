@@ -1,6 +1,8 @@
 
 # SF2 Bitcoin Exchange to MAME Bridge
 
+# Context
+
 ![alt text](https://github.com/VirtusVerbis/SF2_Bitcoin_Bridge/blob/main/readme_src/Sample_Run.png "Sample Run") 
 
 The objective was to create a Bitcoin price action visualizer but instead of looking at a boring chart, I wanted to see the action carried out on Street Fighter 2 via the MAME Emulator.  
@@ -24,18 +26,13 @@ alt="Click to watch trailer" width="400" height="240" border="10" /></a>
 
 # Instructions
 
-Download both 7zip files and extract using 7zip.
-
-https://www.7-zip.org/
+Replit hosting vs Local hosting - to be updated.
 
 
 
 
-# Context
 
-Like many of the folks on the [Chronocrash](https://www.chronocrash.com/) forum, our podcast's love for 2D Beatemups / brawlers started with Double Dragon and Final Fight (among many others).
 
-Having gone down the bitcoin rabbit hole, we were trying to find a way to give back to the bitcoin community, help bring awareness to bitcoin, and at the same time scratch the itch of being able to create our own brawler.
 
 
 
@@ -61,63 +58,3 @@ Here are some great books to read:
 [Mastering Bitcoin (Technical)](https://www.amazon.com/Mastering-Bitcoin-Programming-Open-Blockchain/dp/1098150090/ref=pd_rhf_se_s_pd_sbs_rvi_d_sccl_2_6/137-9373380-1340239?pd_rd_w=COge7&content-id=amzn1.sym.46e2be74-be72-4d3f-86e1-1de279690c4e&pf_rd_p=46e2be74-be72-4d3f-86e1-1de279690c4e&pf_rd_r=GZCSTE83X6H1PAN8ZA6V&pd_rd_wg=5DaNL&pd_rd_r=cd477d3d-d81a-4b35-a215-cb1803bf0650&pd_rd_i=1098150090&psc=1)
 
 
-
-## Saylor
-
-The protagonist depicted in the trailer above, is based on Michael Saylor - the Executive Chairman of Strategy (formerly known as MicroStrategy). Ticker symbol [$MSTR](https://www.google.com/search?q=%24MSTR&rlz=1C1CHBF_enCA1033CA1033&oq=%24MSTR&gs_lcrp=EgZjaHJvbWUyDAgAEEUYORixAxiABDIHCAEQABiABDIHCAIQABiABDIHCAMQABiABDIHCAQQABiABDIGCAUQRRg9MgYIBhBFGD0yBggHEEUYQdIBCDEyMzdqMGo3qAIAsAIA&sourceid=chrome&ie=UTF-8).
-
-Saylor is famous in the bitcoin/twitter/finance space for a few things:
-
-* Originally thought bitcoin was worth nothing, then later changed his mind post COVID and having gone down the bitcoin rabbit hole himself.
-* Being one of the most pro-active speakers on bitcoin (MSNBC, Podcasts, etc.)
-* Actively encouraged and open-sourced a corporate playbook for bitcoin adoption.
-
-![alt text](https://github.com/VirtusVerbis/ProjectSaylor_BitcoinsOfRage/blob/main/readme_src/bitwise_companies.png "Credit Bitwise")
-
-
-* Advocated for a change to the FASB for fair accounting rules relating to bitcoin.
-* Actively leverages his company to buy and hold bitcoin on the balance sheet, via:
-  
-  - issuing Convertible Bonds
-  - issuing At The Market shares
-  - issuing Perpetual Strike Preferred Stock ($STRK)
-  - issuing Perpetual Strife Preferred Stock ($STRF)
-  
-* His company now owns 531,644 BTC (as of April 16th, 2025) - there are only 21 million bitcoins in total.
-
-
-In short, Saylor has financially engineered his company to be a "Fiat to Bitcoin conversion machine/funnel" (ala Fiat Blackhole). Here is a diagram depicting the flywheel effect:
-
-![alt text](https://github.com/VirtusVerbis/ProjectSaylor_BitcoinsOfRage/blob/main/readme_src/mstr_flywheel.png "MSTR Flywheel")
-X/Twitter Credits:
-Concept: @DylanLeClair_ / @PunterJeff / @ryQuant
-Visuals: @BitDeez
-
-
-Since adopting Bitcoin on their balance sheet, Saylor continues to do well for his stakeholders:
-
-![alt text](https://github.com/VirtusVerbis/ProjectSaylor_BitcoinsOfRage/blob/main/readme_src/mstr_chart.png "MSTR Chart")
-Credit Twitter/X: @BitcoinForCorps, @thebtcmag
-
-
-
-If you're interested in knowing more about Strategy ($MSTR), you can also visit their site/dashboard:
-[https://www.strategy.com/](https://www.strategy.com/)
-
-
-Find him on X/Twitter: @saylor
-
-
-
-## The Mod
-
-The mod currently only contains 1 level, complete with a boss and ending. Navigate Saylor through the "City of Tents" to help the citizens regain their financial freedom, rescue hostages along the way, and "orange pill" Fiat Thugs that have been paid off by the Mayor.
-
-None of the so called "enemies" die, they are instead "orange pilled" (obtain an understanding of bitcoin through their interactions with Saylor), they then rise up and walk off into a better future.
-
-Throughout the mod you will hear quotes/phrases made popular by Saylor (from various podcasts, interviews, etc.) - some of them are meme-level.
-
-Here's an example:
-
-<a href="https://www.youtube.com/watch?v=B5if2hthPCs" target="_blank"><img src="https://github.com/VirtusVerbis/ProjectSaylor_BitcoinsOfRage/blob/main/readme_src/callthempoor.png" 
-alt="Click to watch trailer" width="400" height="240" border="10" /></a>
