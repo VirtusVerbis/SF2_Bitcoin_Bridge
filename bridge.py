@@ -29,6 +29,7 @@ class CommandType(Enum):
     SEQUENTIAL = 2
     SIMULTANEOUS = 3
     SINGLE = 4
+    CHARGE = 5
 
 ALLOWED_KEYS = set('abcdefghijklmnopqrstuvwxyz0123456789')
 
@@ -106,11 +107,31 @@ class CryptoMAMEBridge:
             logger.error(f"Error pressing key '{key_char}': {e}")
 
     def parse_command(self, command):
-        """Parse a command string and return (CommandType, tokens)"""
+        """Parse a command string and return (CommandType, tokens)
+        
+        Command formats:
+        - Rapid repeat: "xxxxx" (same key mashed)
+        - Sequential: "x,y,c,u" (comma-separated keys)
+        - Simultaneous: "x+y+c" (keys pressed together)
+        - Charge: "++f,h,x" (hold first key 2s, then sequential with overlap)
+        - Single: "x" (single key press)
+        """
         if not command or not command.strip():
             return None, []
 
         command = command.lower().strip()
+
+        # Check for charge command (starts with "++")
+        if command.startswith('++'):
+            charge_command = command[2:]  # Remove the "++" prefix
+            tokens = [t.strip() for t in charge_command.split(',') if t.strip()]
+            valid_tokens = [t for t in tokens if len(t) == 1 and t in ALLOWED_KEYS]
+            if len(valid_tokens) < 2:
+                logger.warning(f"Charge command '{command}' needs at least 2 keys (charge key + attack)")
+                return None, []
+            if len(valid_tokens) != len(tokens):
+                logger.warning(f"Some tokens in charge command '{command}' are invalid")
+            return CommandType.CHARGE, valid_tokens
 
         if '+' in command:
             tokens = [t.strip() for t in command.split('+') if t.strip()]
@@ -217,6 +238,61 @@ class CryptoMAMEBridge:
                 self.keyboard.release(key)
                 time.sleep(0.03)
 
+    def execute_charge(self, tokens):
+        """Execute a charge move (e.g., Guile's Sonic Boom: ++f,h,x)
+        
+        Charge move timing for SF2:
+        - Hold the charge key (first token) for 2 seconds
+        - Release charge key while pressing the direction key with rolling overlap
+        - Then press the attack key(s)
+        
+        Example: "++f,h,x" means:
+        1. Hold 'f' (back) for 2 seconds
+        2. Release 'f' while pressing 'h' (forward) with 50ms overlap
+        3. Press 'x' (punch) while 'h' is still held
+        4. Release all keys
+        """
+        if len(tokens) < 2:
+            logger.warning(f"Charge command needs at least 2 keys, got: {tokens}")
+            return
+        
+        charge_key = tokens[0]
+        direction_key = tokens[1]
+        attack_keys = tokens[2:] if len(tokens) > 2 else []
+        
+        logger.info(f"Executing charge move: charge={charge_key}, direction={direction_key}, attacks={attack_keys}")
+        
+        try:
+            # Step 1: Hold charge key for 2 seconds
+            self.keyboard.press(charge_key)
+            time.sleep(2.0)
+            
+            # Step 2: Rolling overlap - press direction while still holding charge
+            self.keyboard.press(direction_key)
+            time.sleep(0.05)  # 50ms overlap
+            
+            # Step 3: Release charge key
+            self.keyboard.release(charge_key)
+            time.sleep(0.033)  # Small gap before attack
+            
+            # Step 4: Press attack key(s) while holding direction
+            for attack_key in attack_keys:
+                self.keyboard.press(attack_key)
+                time.sleep(0.033)
+            
+            # Hold the final position briefly
+            time.sleep(0.1)
+            
+            # Step 5: Release all keys (attack keys first, then direction)
+            for attack_key in reversed(attack_keys):
+                self.keyboard.release(attack_key)
+                time.sleep(0.017)
+            
+            self.keyboard.release(direction_key)
+            
+        except Exception as e:
+            logger.error(f"Error executing charge move: {e}")
+
     def execute_special_command(self, command, special_name):
         """Parse and execute a special move command with cooldown protection"""
         now = time.time()
@@ -241,6 +317,8 @@ class CryptoMAMEBridge:
             self.execute_simultaneous(tokens)
         elif cmd_type == CommandType.SINGLE:
             self.press_key(tokens[0])
+        elif cmd_type == CommandType.CHARGE:
+            self.execute_charge(tokens)
 
     def check_special_moves(self, quantity, exchange, signal_type):
         """Check if quantity triggers any special moves for the given exchange and signal type (1-9)"""
@@ -454,7 +532,7 @@ class CryptoMAMEBridge:
 if __name__ == "__main__":
     import os
     # Update this with your actual dashboard URL if running remotely
-     #bridge = CryptoMAMEBridge()
-    bridge = CryptoMAMEBridge(dashboard_url="https://01d3b94d-949b-4da2-9756-6701b7e2206c-00-l9ynzecjxojp.worf.replit.dev/")
+    bridge = CryptoMAMEBridge()
+    
 
     bridge.run()
