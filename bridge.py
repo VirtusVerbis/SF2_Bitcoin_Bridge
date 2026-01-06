@@ -30,6 +30,7 @@ class CommandType(Enum):
     SIMULTANEOUS = 3
     SINGLE = 4
     CHARGE = 5
+    HALF_CIRCLE_CHARGE = 6
 
 ALLOWED_KEYS = set('abcdefghijklmnopqrstuvwxyz0123456789')
 
@@ -121,17 +122,23 @@ class CryptoMAMEBridge:
 
         command = command.lower().strip()
 
-        # Check for charge command (starts with "++")
+        # Check for charge commands (starts with "++")
+        # CHARGE: 3 keys (++f,h,x) - hold charge, release to direction, attack
+        # HALF_CIRCLE_CHARGE: 4+ keys (++f,g,h,x) - hold charge, roll through directions, attack
         if command.startswith('++'):
             charge_command = command[2:]  # Remove the "++" prefix
             tokens = [t.strip() for t in charge_command.split(',') if t.strip()]
             valid_tokens = [t for t in tokens if len(t) == 1 and t in ALLOWED_KEYS]
-            if len(valid_tokens) < 2:
-                logger.warning(f"Charge command '{command}' needs at least 2 keys (charge key + attack)")
+            if len(valid_tokens) < 3:
+                logger.warning(f"Charge command '{command}' needs at least 3 keys (charge + direction + attack)")
                 return None, []
             if len(valid_tokens) != len(tokens):
                 logger.warning(f"Some tokens in charge command '{command}' are invalid")
-            return CommandType.CHARGE, valid_tokens
+            # 3 keys = CHARGE, 4+ keys = HALF_CIRCLE_CHARGE
+            if len(valid_tokens) == 3:
+                return CommandType.CHARGE, valid_tokens
+            else:
+                return CommandType.HALF_CIRCLE_CHARGE, valid_tokens
 
         if '+' in command:
             tokens = [t.strip() for t in command.split('+') if t.strip()]
@@ -293,6 +300,61 @@ class CryptoMAMEBridge:
         except Exception as e:
             logger.error(f"Error executing charge move: {e}")
 
+    def execute_half_circle_charge(self, tokens):
+        """Execute a half-circle charge move (e.g., Dhalsim's Yoga Flame: ++f,g,h,x)
+        
+        Half-circle charge move timing for SF2:
+        - Hold the first key (charge) for 2 seconds
+        - Roll through middle direction keys with overlapping releases
+        - Keep final direction held while pressing attack
+        
+        Example: "++f,g,h,x" means:
+        1. Hold 'f' (back) for 2 seconds
+        2. Press 'g' (down) while releasing 'f' with overlap
+        3. Press 'h' (forward) while releasing 'g' with overlap
+        4. Press 'x' (punch) while 'h' is still held
+        5. Release all keys
+        """
+        if len(tokens) < 4:
+            logger.warning(f"Half-circle charge needs at least 4 keys, got: {tokens}")
+            return
+        
+        charge_key = tokens[0]
+        direction_keys = tokens[1:-1]  # All middle keys are directions
+        attack_key = tokens[-1]
+        
+        logger.info(f"Executing half-circle charge: charge={charge_key}, directions={direction_keys}, attack={attack_key}")
+        
+        try:
+            # Step 1: Hold charge key for 2 seconds
+            self.keyboard.press(charge_key)
+            time.sleep(2.0)
+            
+            # Step 2: Roll through direction keys with overlapping releases
+            prev_key = charge_key
+            for direction_key in direction_keys:
+                # Press next direction while still holding previous
+                self.keyboard.press(direction_key)
+                time.sleep(0.05)  # 50ms overlap
+                
+                # Release previous key
+                self.keyboard.release(prev_key)
+                time.sleep(0.033)  # Small gap
+                
+                prev_key = direction_key
+            
+            # Step 3: Press attack while holding final direction
+            self.keyboard.press(attack_key)
+            time.sleep(0.1)  # Hold briefly
+            
+            # Step 4: Release attack first, then final direction
+            self.keyboard.release(attack_key)
+            time.sleep(0.017)
+            self.keyboard.release(prev_key)
+            
+        except Exception as e:
+            logger.error(f"Error executing half-circle charge move: {e}")
+
     def execute_special_command(self, command, special_name):
         """Parse and execute a special move command with cooldown protection"""
         now = time.time()
@@ -319,6 +381,8 @@ class CryptoMAMEBridge:
             self.press_key(tokens[0])
         elif cmd_type == CommandType.CHARGE:
             self.execute_charge(tokens)
+        elif cmd_type == CommandType.HALF_CIRCLE_CHARGE:
+            self.execute_half_circle_charge(tokens)
 
     def check_special_moves(self, quantity, exchange, signal_type):
         """Check if quantity triggers any special moves for the given exchange and signal type (1-9)"""
@@ -533,6 +597,6 @@ if __name__ == "__main__":
     import os
     # Update this with your actual dashboard URL if running remotely
     bridge = CryptoMAMEBridge()
-    
+  
 
     bridge.run()
