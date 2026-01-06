@@ -728,7 +728,7 @@ export function ConfigPanel({ config }: ConfigPanelProps) {
           Special Moves
         </h4>
         <p className="text-[10px] text-muted-foreground/60 -mt-2">
-          Commands: "xxx" (rapid), "x,y,z" (sequence), "x+y" (simultaneous), "++x,y,z" (charged)
+          Commands: "xxx" (rapid), "x,y,z" (sequence), "x+y+z" (simultaneous), "++x,y,z" (charge), "++x,y,z,w" (half-circle charge)
         </p>
         {specials.map((special) => (
           <div key={special.id} className="space-y-2 p-3 rounded-lg bg-gradient-to-r from-purple-500/10 to-cyan-500/10 border border-purple-500/20">
