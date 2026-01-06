@@ -238,8 +238,9 @@ class CryptoMAMEBridge:
             for key in tokens:
                 self.keyboard.press(key)
                 pressed_keys.append(key)
-                time.sleep(0.03)
-            time.sleep(0.1)
+                #time.sleep(0.03)
+            #time.sleep(0.1)
+            time.sleep(2)
         finally:
             for key in reversed(pressed_keys):
                 self.keyboard.release(key)
