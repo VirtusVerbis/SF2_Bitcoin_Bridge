@@ -188,7 +188,7 @@ OR you can access it via Terminal using 'psql' command.
 		Port: Usually 5432
 		Database name: crypto_mame (or any name you choose)
 	
-	Permenant method:
+	Permanent method:
 	
 	how to set permenant psql connection string "export DATABASE_URL="postgresql://your_username:your_password@localhost:5432/crypto_mame"" in windows11
 	
