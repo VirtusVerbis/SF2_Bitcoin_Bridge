@@ -318,9 +318,15 @@ if __name__ == "__main__":
     bridge = CryptoMAMEBridge(dashboard_url="http://localhost:5000/")  #local server   <----- use this for LOCAL
 ```
 
+Run it with:
+
+```
+python bridge.py
+```
+
 ### How to configure buttons
 
-6) "Restore Default" values in the dashboard > settings page.  
+6) "Restore Default" values in the web dashboard > settings page.  
 
 This is required because the DB internal defaults are just examples choosen by AI.  "Restoring Defaults" will reload all the hardcoded constants that have been tested working and specific to my MAME key config.  You can change the keys to whatever you prefer, as well as adusting the BTC range thresholds to trigger each move.
 
