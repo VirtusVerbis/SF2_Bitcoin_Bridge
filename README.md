@@ -32,7 +32,7 @@ alt="Click to watch trailer" width="400" height="240" border="10" /></a>
 
 ### Local hosting
 
-The following has to be done (steps and updates/changes) in order to get the server /webppage / DB to have it all running locally on your PC.
+The following has to be done (steps and updates/changes) in order to get the server /webppage / DB to have it all running locally on your PC.  Instructions are taken from Gemini, so if anything is unclear try using AI to help explain.
 
 
 To run this project on your local computer, you'll need:
@@ -66,9 +66,11 @@ You can unzip your project folder anywhere (ie: C or D drive, anything physical)
 
 1b) You might hit this error:
 
+```
 "\nodejs\npm.ps1 cannot be loaded because running scripts is disabled on this system. For more information, see about_Execution_Policies at https:/go.microsoft.com/fwlink/?LinkID=135170"
+```
 
-	To resolve this, you will need to modify the execution policy. The safest approach for this specific scenario is usually to set the policy to RemoteSigned for your current user. 
+To resolve this, you will need to modify the execution policy. The safest approach for this specific scenario is usually to set the policy to RemoteSigned for your current user. 
 
 	Here are the steps to modify the execution policy and resolve the error:
 
