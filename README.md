@@ -32,7 +32,7 @@ alt="Click to watch trailer" width="400" height="240" border="10" /></a>
 
 ### Local hosting
 
-The following has to be done (steps and updates/changes) in order to get the server /webppage / DB to have it all running locally on your PC.  Instructions are taken from Gemini, so if anything is unclear try using AI to help explain.
+The following has to be done (steps and updates/changes) in order to get the server /webppage / DB to have it all running locally on your PC.  Instructions are taken from Replit/Gemini, so if anything is unclear try using AI to help explain.
 
 
 To run this project on your local computer, you'll need:
@@ -89,7 +89,9 @@ To resolve this, you will need to modify the execution policy. The safest approa
 	This command displays the policies set for different scopes (MachinePolicy, UserPolicy, Process, CurrentUser, LocalMachine) [1]. 
 
 	3. Change the Execution Policy 
-	To allow local scripts to run while requiring digitally signed scripts from the internet, run the following command. This setting usually resolves the npm issue without significantly lowering security [1]. 
+	To allow local scripts to run while requiring digitally signed scripts from the internet, run the following command. 
+	This setting usually resolves the npm issue without significantly lowering security [1]. 
+	
 	powershell
 	Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 
@@ -98,7 +100,8 @@ To resolve this, you will need to modify the execution policy. The safest approa
 	Type A and press Enter to select "Yes to All". 
 
 	5. Try Running npm Again 
-	After changing the execution policy, the error should be resolved. Close the administrative PowerShell window and open a new, regular terminal or Command Prompt window (no admin privileges needed) and try running your npm command again (e.g., npm install or npm -v). 
+	After changing the execution policy, the error should be resolved. Close the administrative PowerShell window and open a new, 
+	regular terminal or Command Prompt window (no admin privileges needed) and try running your npm command again (e.g., npm install or npm -v). 
 
 Once done installing, you should get a notification indicating so in the terminal prompt.
 
@@ -109,9 +112,12 @@ If you screw up and can't remember the password, you can ask AI on how to bypass
 
 2aa) You might hit this error:
 
+```
 "psql : The term 'psql' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the spelling of the name, or if a path was included, verify that the path is correct and try again."
+```
 
-	The error message "psql : The term 'psql' is not recognized..." occurs on Windows because the system does not know where to find the psql executable. You need to add the PostgreSQL installation's bin directory to your system's PATH environment variable. 
+	The error message "psql : The term 'psql' is not recognized..." occurs on Windows because the system does not know where to find the psql executable. 
+	You need to add the PostgreSQL installation's bin directory to your system's PATH environment variable. 
 	Step-by-Step Guide to Fix the Error
 	Locate the PostgreSQL bin directory: The default installation path is usually C:\Program Files\PostgreSQL\<version>\bin (e.g., C:\Program Files\PostgreSQL\16\bin). Note the exact path for your version.
 	Open Environment Variables:
@@ -137,7 +143,7 @@ If you screw up and can't remember the password, you can ask AI on how to bypass
 
 One installed, you can run the SQL Shell (psql) app (search for it in Windows apps).
 
-OR you can access it via Terminal (with admin rights) using 'psql' command.
+OR you can access it via Terminal using 'psql' command.
 
 
 
@@ -211,21 +217,23 @@ OR you can access it via Terminal (with admin rights) using 'psql' command.
 
 
 3) Run database migrations in terminal/powershell:
-
+```
 npm run db:push
-
+```
 This command deploys the DB schema to your Locally created DB in psql.
+
 
 ### How to Run it
 
 4) Start the application:
-
+```
 npm run dev
-
+```
 
 You might hit this error:
-
+```
 getting npm error "Error: listen ENOTSUP: operation not supported on socket 0.0.0.0:5000"
+```
 
 	That error happens because 0.0.0.0 binding isn't supported on some local systems (especially Windows/macOS). The app is configured for Replit's environment.
 
@@ -256,10 +264,10 @@ getting npm error "Error: listen ENOTSUP: operation not supported on socket 0.0.
 		
 
 
-
 You might get this error:
-
+```
 "npm run dev > rest-express@1.0.0 dev > NODE_ENV=development tsx server/index.ts 'NODE_ENV' is not recognized as an internal or external command, operable program or batch file."
+```
 
 	The syntax NODE_ENV=development ... is used in Unix-based systems (like macOS and Linux), but Windows command prompt (cmd.exe) uses a different command to set environment variables. 
 	How to Fix the Error
@@ -299,26 +307,24 @@ You should see the dashboard running normally.
 Edit the bridge.py for:
 
 Line 454:
-
+```
 if __name__ == "__main__":
     import os
     # Update this with your actual dashboard URL if running remotely
-    #bridge = CryptoMAMEBridge()
-    #bridge = CryptoMAMEBridge(dashboard_url="https://01d3b94d-949b-4da2-9756-6701b7e2206c-00-l9ynzecjxojp.worf.replit.dev/")  #replit server
+    # bridge = CryptoMAMEBridge()
     bridge = CryptoMAMEBridge(dashboard_url="http://localhost:5000/")  #local server   <----- use this for LOCAL
+```
 
+### How to configure buttons
 
 6) "Restore Default" values in the dashboard > settings page.  
 
-This is required because the DB internal defaults are just examples choosen by AI.  "Restoring Defaults" will reload all the hardcoded constants that have been tested working and specific to your MAME key config.  
+This is required because the DB internal defaults are just examples choosen by AI.  "Restoring Defaults" will reload all the hardcoded constants that have been tested working and specific to my MAME key config.  You can change the keys to whatever you prefer, as well as adusting the BTC range thresholds to trigger each move.
 
 If you miss this part, it will look like Ryu and Ken are doing stuff, but can't seem to do the special combos, etc. - as if something is broken, what's really broken is the settings being defaulted to incorrect keys.
 
-7) all done.  enjoy.
+7) All done.  Enjoy.
 
-
-
-How to configure buttons - to be updated.
 
 
 
