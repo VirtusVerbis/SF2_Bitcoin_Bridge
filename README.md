@@ -30,7 +30,10 @@ alt="Click to watch trailer" width="400" height="240" border="10" /></a>
 
 [Replit Instructions](https://docs.replit.com/getting-started/quickstarts/import-from-zip)
 
-### Local hosting (Innvoled/Liberating)
+Untested but should work.
+
+
+### Local hosting (Involved/Liberating)
 
 The following has to be done (steps and updates/changes) in order to get the server /webppage / DB to have it all running locally on your PC.  Instructions are taken from Replit/Gemini, so if anything is unclear try using AI to help explain.
 
