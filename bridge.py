@@ -230,6 +230,8 @@ class CryptoMAMEBridge:
         SF2 timing: 30ms stagger between presses, 100ms hold, then release
         This ensures all keys register as pressed together for chord inputs
         """
+        time.sleep(1)   # add this to calm/block all other keyboard inputs for 1 sec; otherwise too many keys interrupt
+        
         if not tokens:
             return
         logger.info(f"Executing simultaneous: {tokens}")
